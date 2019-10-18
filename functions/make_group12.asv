@@ -8,10 +8,7 @@ nMatch = size(matchList,2);
 featList = matchList(1,:);
 featList_unique = unique(featList);
 nGroup = length(featList_unique);
-% group = logical(sparse(nGroup,nMatch));
-% group = sparse(nGroup,nMatch);
 group = logical(zeros(nGroup,nMatch));
-
 for i=1:nGroup
     group(i, find(featList == featList_unique(i))) = true;
 end
@@ -20,10 +17,7 @@ group1 = group';
 featList = matchList(2,:);
 featList_unique = unique(featList);
 nGroup = length(featList_unique);
-% group = logical(sparse(nGroup,nMatch));
-% group = sparse(nGroup,nMatch);
-group = logical(zeros(nGroup,nMatch));
-
+group = logical(sparse(nGroup,nMatch));
 for i=1:nGroup
     group(i, find(featList == featList_unique(i))) = true;
 end

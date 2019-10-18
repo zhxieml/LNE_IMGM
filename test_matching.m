@@ -13,9 +13,9 @@ disp('== initialize an object model...');
 listOfModelDataFile = dir(fullfile(conf.imgDir, cls, '*.png'));
 
 
-hAlg1 = figure('Name',sprintf('%s', alg(1).strName), 'NumberTitle', 'off'); 
+% hAlg1 = figure('Name',sprintf('%s', alg(1).strName), 'NumberTitle', 'off'); 
 %hAlg2 = figure('Name',sprintf('%s', alg(2).strName), 'NumberTitle', 'off'); 
-hFeat = figure('Name','model initialization', 'NumberTitle', 'off'); 
+% hFeat = figure('Name','model initialization', 'NumberTitle', 'off'); 
 
 %% load image1
 idxTest1 = 1;
@@ -75,11 +75,11 @@ for i=1:numel(idxTest2)
     imgInput = appendimages( cdata.view(1).img, cdata.view(2).img );
     imgInput = double(imgInput)./255;
     offset_x = size(cdata.view(1).img,2);
-    set(0, 'CurrentFigure', hFeat); clf;
+%     set(0, 'CurrentFigure', hFeat); clf;
     %figure('Name','model initialization', 'NumberTitle', 'off'); 
-    imshow(rgb2gray(imgInput)); hold on;
-    visualizeFeatures(cdata.view(1).frame, 'style', 'point', 'colorcode', 'g');
-    visualizeFeatures(cdata.view(2).frame, 'style', 'point', 'colorcode', 'g', 'offset', [offset_x 0] );
+%     imshow(rgb2gray(imgInput)); hold on;
+%     visualizeFeatures(cdata.view(1).frame, 'style', 'point', 'colorcode', 'g');
+%     visualizeFeatures(cdata.view(2).frame, 'style', 'point', 'colorcode', 'g', 'offset', [offset_x 0] );
 
     %% perform matching
     res = wrapper_matchingBasic( alg(1), cdata );
@@ -87,13 +87,13 @@ for i=1:numel(idxTest2)
     fprintf('%10s - score:%.5f (%.5f), xxxsec \n', alg(1).strName, res.score_raw, res.score_GM);      
 
     
-    set(0, 'CurrentFigure', hAlg1); clf;
+%     set(0, 'CurrentFigure', hAlg1); clf;
     %figure('Name',sprintf('%s', alg(1).strName), 'NumberTitle', 'off'); 
-    imshow(rgb2gray(imgInput)); hold on;
-    colorCode = makeColorCode(nnz(res.X));
+%     imshow(rgb2gray(imgInput)); hold on;
+%     colorCode = makeColorCode(nnz(res.X));
 
-    visualizeMatches( cdata.view(1).frame, cdata.view(2).frame, res.cand_matchlist(:,find(res.X)), ...
-        'offset', [size(cdata.view(1).img,2) 0], 'style', 'frame', 'colorcode', colorCode, 'weight', res.X_raw(find(res.X)) ); 
+%     visualizeMatches( cdata.view(1).frame, cdata.view(2).frame, res.cand_matchlist(:,find(res.X)), ...
+%         'offset', [size(cdata.view(1).img,2) 0], 'style', 'frame', 'colorcode', colorCode, 'weight', res.X_raw(find(res.X)) ); 
 
     %if i == 0
     %    visualizeSIFT2(cdata.view(1).desc, cdata.view(1).frame, 'descscale', fparam.descScale);

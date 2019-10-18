@@ -6,7 +6,7 @@ function [ matchInfo ] = make_initialmatches_mcho2( viewInfo, mparam, varargin )
 % Minsu Cho, Seoul National University
 % Updated: 16th November March 2011
 
-bVerbose = false ;
+bVerbose = false;
 bShow = false;
 
 for k=1:2:length(varargin)
