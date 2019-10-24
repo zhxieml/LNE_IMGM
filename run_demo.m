@@ -422,7 +422,7 @@ for testk = 1:testCnt
                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     
                     tStart = tic;
-                    imgmIncreMatching = IMGM(simAP, imgmMatTmp, param);
+                    imgmIncreMatching = IMGM_old(simAP, imgmMatTmp, param);
                     tEnd = toc(tStart);
                     imgmPrevMatching = imgmIncreMatching;
                     

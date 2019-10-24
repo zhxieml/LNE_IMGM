@@ -32,12 +32,12 @@ function M = IMGM_old(affScore, rawMat, param)
     medianSimilarity = median(Similarity(:));
     p = ones([1 N])*medianSimilarity;
     %%%%%%%%%%%% visualize graphs if specified %%%%%%%%%%%%%%%%
-    if param.visualization == 1
-        maxSim = max(Similarity(:));
-        tmpSimilarity = Similarity + eye(N)*1.05*maxSim;
-        tmpSimilarity = ones(N,N)*1.05*maxSim - tmpSimilarity;
-        pointMDS = mdscale(tmpSimilarity.^2, 2);
-    end
+%     if param.visualization == 1
+%         maxSim = max(Similarity(:));
+%         tmpSimilarity = Similarity + eye(N)*1.05*maxSim;
+%         tmpSimilarity = ones(N,N)*1.05*maxSim - tmpSimilarity;
+%         pointMDS = mdscale(tmpSimilarity.^2, 2);
+%     end
     %%%%%%%%%%%%%%%%% generating the topology of hypergraph %%%%%%%%%%%%%%%
     if param.method == isAP
         %tic;
