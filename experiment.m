@@ -63,6 +63,18 @@ target.config.category = 'outlier';% only outlier are supported here
 setObsoleteVariables;% some old parameters are used for debug and other tests, less relevant to the algorithm
 algpar = setPairwiseSolver();
 
+timAve = zeros(paraCnt,algCnt,testCnt);timAveFull = zeros(paraCnt,algCnt);
+accAve = zeros(paraCnt,algCnt,testCnt);accAveFull = zeros(paraCnt,algCnt);
+scrAve = zeros(paraCnt,algCnt,testCnt);scrAveFull = zeros(paraCnt,algCnt);
+conPairAve = zeros(paraCnt,algCnt,testCnt);conPairAveFull = zeros(paraCnt,algCnt);
+accStd = zeros(paraCnt,algCnt,testCnt);accStdFull = zeros(paraCnt,algCnt);
+scrStd = zeros(paraCnt,algCnt,testCnt);scrStdFull = zeros(paraCnt,algCnt);
+conPairStd = zeros(paraCnt,algCnt,testCnt);conPairStdFull = zeros(paraCnt,algCnt);
+
+conMatPairGraph = cell(paraCnt,algCnt,testCnt);
+accMatPairGraph = cell(paraCnt,algCnt,testCnt);
+scrMatPairGraph = cell(paraCnt,algCnt,testCnt);
+
 % Choose to run which part of the test
 test_one_increment = false;
 test_multiple_increment = true;
@@ -265,6 +277,24 @@ for testk = 1:testCnt
             end
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
 
+
+            % now compute the performance
+            for algk = 1:algCnt
+                if algSet.algEnable(algk)==0||isempty(X{algk}),continue;end
+                txt = algSet.algNameSet(algk);
+                % compute the accuracy, affinity score, consistency for each pair of graphs
+                accMatPairGraph{parak,algk,testk} = cal_pair_graph_accuracy(X{algk},affinity.Xgt,target.config.nOutlier,nodeCnt,viewCnt);
+                scrMatPairGraph{parak,algk,testk} = cal_pair_graph_score(X{algk},affinity.Xgt,nodeCnt,viewCnt);
+                conMatPairGraph{parak,algk,testk} = cal_pair_graph_consistency(X{algk},nodeCnt,viewCnt,0);
+                % the overall accuracy and affinity score, note the diagnal
+                % of xxxMatPairGraph is dismissed because they are meaningless
+                accAve(parak,algk,testk) = accAve(parak,algk,testk)+mean(accMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));
+                accStd(parak,algk,testk) = accStd(parak,algk,testk)+std(accMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));
+                scrAve(parak,algk,testk) = scrAve(parak,algk,testk)+mean(scrMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));%mean(scrtmp(:,parak,algk));
+                scrStd(parak,algk,testk) = scrStd(parak,algk,testk)+std(scrMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));%std(scrtmp(:,parak,algk));
+                conPairAve(parak,algk,testk) = conPairAve(parak,algk,testk)+mean(conMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));
+                conPairStd(parak,algk,testk) = conPairStd(parak,algk,testk)+std(conMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));
+            end %for algk
         end
     end
 end

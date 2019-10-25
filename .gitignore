@@ -2,6 +2,7 @@
 *.mat
 *.csv
 /data
+*.asv
 
 # image
 *.png
