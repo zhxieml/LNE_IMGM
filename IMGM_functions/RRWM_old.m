@@ -1,5 +1,5 @@
 %% Implementaion of PageRank matching algortihm
-function [ X ] = RRWM( M, nP1, nP2, algpar)
+function [ X ] = RRWM_old( M, nP1, nP2, algpar)
 % MATLAB demo code of Reweighted Random Walks Graph Matching of ECCV 2010
 %
 % Minsu Cho, Jungmin Lee, and Kyoung Mu Lee, 

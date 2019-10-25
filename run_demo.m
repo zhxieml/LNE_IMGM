@@ -1,19 +1,19 @@
 %    ****************************************** Notice **********************************
-%    This demo contains and tests the algorithmic code of two following papers (and their conference versions):  
+%    This demo contains and tests the algorithmic code of two following papers (and their conference versions):
 %    [1] alg1/2/3: Multi-Graph Matching via Affinity Optimization with Graduated Consistency Regularization
-%    IEEE Transactions on Pattern Analysis and Machine Intelligence, 2015 
-%    Conference version: Graduated Consistency-Regularized Optimization for Multi-Graph Matching, ECCV 2014  
-% 
+%    IEEE Transactions on Pattern Analysis and Machine Intelligence, 2015
+%    Conference version: Graduated Consistency-Regularized Optimization for Multi-Graph Matching, ECCV 2014
+%
 %    [2] matchOpt (mOpt): Consistency-Driven Alternating Optimization for Multigraph Matching: A Unified Approach
 %    IEEE Transactions on Image Processing, 2015
 %    Conference version: Joint Optimization for Consistent Multiple Graph Matching, ICCV 2013
-% 
+%
 %    In this demo code, it reproduces (randomly) the bottom row of Fig.3 and Fig.5(b)
 %    on synthetic dataset, hence it is self-contained and no dependency on other data sources
 %    Code written by Junchi Yan, Shanghai Jiao Tong University, 2013-2015
-%    Note the demo code is extracted from the raw code of the TPAMI and TIP implementation for unit test. 
+%    Note the demo code is extracted from the raw code of the TPAMI and TIP implementation for unit test.
 %    Please cite the above papers, if you would like to use the code in your research
-%   
+%
 %    Other relevant multi-graph/pairwise matching work compared in this demo code:
 %    [3] matchSync (mSync): Pachauri et al. Solving the multi-way matching problem by permutation synchronization, NIPS 2013
 %    [4] mpm: Cho et al. Finding matches in a haystack: a max-pooling strategy for graph matching in the presence of outliers, CVPR 2014
@@ -26,11 +26,11 @@
 %    *************************************************************************************
 clear *;clear -global *;close all;clc; clear all;
 global affinity target
-varyMinGrhCnt=4;varyMaxGrhCnt=32;grhTestCnt = 5;% 
+varyMinGrhCnt=4;varyMaxGrhCnt=32;grhTestCnt = 5;%
 
 setPlotColor;
 setObsoleteVariables;% some old parameters are used for debug and other tests, less relevant to the algorithm
-% by default set to 0 for target.config.useCstInlier (affinity-driven), no use in formal test type, only useful in massiveOutlier mode 
+% by default set to 0 for target.config.useCstInlier (affinity-driven), no use in formal test type, only useful in massiveOutlier mode
 % target.config.useCstInlier = 0;% set to 1 if use consistency to mask inliers, otherwise use affinity metrics, see Sec 3.5 in PAMI paper
 % random graph test, note not the random point set test as used in mpm
 % testType: different modes for tests, e.g. formal (Fig.3&4), case(Fig.1), iter(Fig.2), massOutlier(Fig.5&6)
@@ -72,21 +72,21 @@ else
     target.config.inCntType = 'all';% set 'all' for "only a few outlier case", e.g. Fig.1&2&3&4
     target.config.category = 'deform';%'deform','outlier','density','complete'
     switch target.config.category
-        case 'deform'% same setting with 5th row in Table 1 in the PAMI paper 
+        case 'deform'% same setting with 5th row in Table 1 in the PAMI paper
             nInlier = 10;target.config.nOutlier = 0;target.config.deform = 0.15;
             target.config.density = .9;target.config.complete = 1;
             graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-        case 'outlier'% same setting with 6th row in Table 1 in the PAMI paper 
+        case 'outlier'% same setting with 6th row in Table 1 in the PAMI paper
             nInlier = 6;target.config.nOutlier = 4;target.config.deform = 0;
             target.config.density = 1;target.config.complete = 1;
             graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-        case 'density'% same setting with 7th row in Table 1 in the PAMI paper 
+        case 'density'% same setting with 7th row in Table 1 in the PAMI paper
             nInlier = 10;target.config.nOutlier = 0;target.config.deform = 0.0;
             target.config.density = 0.5;target.config.complete = 1;
             graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-        case 'complete'% same setting with 8th row in Table 1 in the PAMI paper 
+        case 'complete'% same setting with 8th row in Table 1 in the PAMI paper
             nInlier = 10;target.config.nOutlier = 0;target.config.deform = 0.05;
-            target.config.density = 1;target.config.complete = 0.1;     
+            target.config.density = 1;target.config.complete = 0.1;
     end
 end
 graphRange = graphMinCnt:4:graphMaxCnt;
@@ -111,7 +111,7 @@ iterCnt = length(iterRange);
 [~,cao_ucIdx] = ismember('cao_uc',algSet.algNameSet);
 [~,cao_pc_Idx] = ismember('cao_pc_',algSet.algNameSet);[~,cao_pc_sIdx] = ismember('cao_pc_s',algSet.algNameSet);
 [~,cao_pcIdx] = ismember('cao_pc',algSet.algNameSet);
-algCnt = length(algSet.algEnable); 
+algCnt = length(algSet.algEnable);
 X=cell(algCnt,1);
 target.config.nodeCnt = length(target.config.selectNodeMask);
 % target.config.graphCnt = min(max(graphRange),length(target.config.selectGraphMask{1}));
@@ -149,12 +149,15 @@ fprintf('\n');fprintf(fidPerf,'\n');
 inlierAcc = zeros(paraCnt,testCnt);
 % now start to test
 estErr = zeros(testCnt,1);
+
+algpar.algMethod = 'RRWM_old';
+
 for testk = 1:testCnt
     affinity = generateRandomAffinity(nInlier,testk);
     affinity.GT = repmat(eye(nodeCnt,nodeCnt),graphCnt,graphCnt);%just use identity matrix as grund truth matchings
     
     % rrwm pairwise match, once for all graph pairs
-    tStart = tic;% compute all pairwise matchings at one time -> rawMat 
+    tStart = tic;% compute all pairwise matchings at one time -> rawMat
     rawMat = generatePairAssignment(algpar,nodeCnt,graphCnt,testk);% generate matchings by pairwise matching solver
     rawTotalTime = toc(tStart);
     
@@ -165,12 +168,12 @@ for testk = 1:testCnt
         mpmMat = generatePairAssignment(mpmAlgPar,nodeCnt,graphCnt,testk);
         mpmTotalTime = toc(tStart);
     end
-            
+    
     switch target.config.inCntType
         case 'exact' % already known, used in Fig.5 and top two rows in Fig.6
-             target.config.inCnt = nodeCnt - target.config.nOutlier;
+            target.config.inCnt = nodeCnt - target.config.nOutlier;
         case 'all' % in case of few outliers, used in Fig.1,2,3,4
-             target.config.inCnt = nodeCnt;
+            target.config.inCnt = nodeCnt;
         case 'spec' % specified by user, used in the bottom row of Fig.6
             target.config.inCnt = specNodeCnt;
     end
@@ -219,7 +222,7 @@ for testk = 1:testCnt
             end
             % iccvMethod
             [~,iccvIdx] = ismember('mOpt',algSet.algNameSet);
-            if iccvIdx>0&&algSet.algEnable(iccvIdx) 
+            if iccvIdx>0&&algSet.algEnable(iccvIdx)
                 tStart = tic;
                 algpar.bPathSelect = 1;% a flag parameter used in the T-IP paper, see more details in the paper abut path selection discussion
                 X{iccvIdx} = ConsistMultiMatch(updGrhList,nodeCnt,viewCnt,algpar,baseMat);
@@ -227,18 +230,18 @@ for testk = 1:testCnt
             end
             % now the suite of algorithms proposed in the PAMI paper
             if cao_Idx>0&&algSet.algEnable(cao_Idx)% use consistency-driven inlier elicination, by default for few oulier case
-                tStart = tic;% see Alg.1 in the pami paper, CAO: composition based affinity optimization 
+                tStart = tic;% see Alg.1 in the pami paper, CAO: composition based affinity optimization
                 X{cao_Idx} = CAO(baseMat,nodeCnt,viewCnt,iterRange,scrDenom,'afnty',1);
-                timeCost = toc(tStart) + rawPairMatchTime;timAve(parak,cao_Idx,testk) = timAve(parak,cao_Idx,testk) + timeCost; 
+                timeCost = toc(tStart) + rawPairMatchTime;timAve(parak,cao_Idx,testk) = timAve(parak,cao_Idx,testk) + timeCost;
                 if caoIdx&&algSet.algEnable(caoIdx),tStart = tic;
                     X{caoIdx} = SynchronizePermute(X{cao_Idx},nodeCnt,viewCnt,'sync');
                     timAve(parak,caoIdx,testk) = timAve(parak,caoIdx,testk) + toc(tStart) + timeCost;
                 end
             end
             if cao_sIdx>0&&algSet.algEnable(cao_sIdx)% use affinity-driven inlier elicination
-                tStart = tic;% see Alg.1 in the pami paper, CAO: composition based affinity optimization 
+                tStart = tic;% see Alg.1 in the pami paper, CAO: composition based affinity optimization
                 X{cao_sIdx} = CAO(baseMat,nodeCnt,viewCnt,iterRange,scrDenom,'afnty',0);
-                timeCost = toc(tStart) + rawPairMatchTime;timAve(parak,cao_sIdx,testk) = timAve(parak,cao_sIdx,testk) + timeCost; 
+                timeCost = toc(tStart) + rawPairMatchTime;timAve(parak,cao_sIdx,testk) = timAve(parak,cao_sIdx,testk) + timeCost;
             end
             if cao_uc_Idx&&algSet.algEnable(cao_uc_Idx),tStart = tic;
                 X{cao_uc_Idx} = CAO(baseMat,nodeCnt,viewCnt,iterRange,scrDenom,'unary',1);
@@ -247,7 +250,7 @@ for testk = 1:testCnt
                 if cao_ucIdx&&algSet.algEnable(cao_ucIdx)
                     X{cao_ucIdx} = SynchronizePermute(X{cao_uc_Idx},nodeCnt,viewCnt,'sync');
                     timAve(parak,cao_ucIdx,testk) = timAve(parak,cao_ucIdx,testk) + toc(tStart) + ...
-                    rawTotalTime*viewCnt*(viewCnt-1)/(graphCnt*(graphCnt-1));
+                        rawTotalTime*viewCnt*(viewCnt-1)/(graphCnt*(graphCnt-1));
                 end
             end
             if cao_uc_sIdx&&algSet.algEnable(cao_uc_sIdx),tStart = tic;
@@ -283,7 +286,7 @@ for testk = 1:testCnt
                 timeCost = toc(tStart) + rawPairMatchTime;
                 timAve(parak,cao_c_sIdx,testk) = timAve(parak,cao_c_sIdx,testk) + timeCost;
             end
-           %% IMGM
+            %% IMGM
             if 1
                 param.n = 10; param.N = graphCnt - 1;
                 param.iterMax = iterRange;
@@ -333,24 +336,24 @@ for testk = 1:testCnt
                 results = ['The results of CAO on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
                 disp(results);
                 
-%                 accRAW = cal_pair_graph_accuracy(rawMat,affinity.GT, target.config.nOutlier, nodeCnt, 32);
-%                 scrRAW = cal_pair_graph_score(rawMat,affinity.GT,nodeCnt,32);
-%                 conRAW = cal_pair_graph_consistency(rawMat,nodeCnt,32,0);
-%                 results = ['The results of Raw on 32 graphs, accuracy:',num2str(mean(accRAW(:))),', score:',num2str(mean(scrRAW(:))),', consistency:',num2str(mean(conRAW(:)))];
-%                 disp(results);
+                %                 accRAW = cal_pair_graph_accuracy(rawMat,affinity.GT, target.config.nOutlier, nodeCnt, 32);
+                %                 scrRAW = cal_pair_graph_score(rawMat,affinity.GT,nodeCnt,32);
+                %                 conRAW = cal_pair_graph_consistency(rawMat,nodeCnt,32,0);
+                %                 results = ['The results of Raw on 32 graphs, accuracy:',num2str(mean(accRAW(:))),', score:',num2str(mean(scrRAW(:))),', consistency:',num2str(mean(conRAW(:)))];
+                %                 disp(results);
                 
-%                 tStart = tic;
-%                 Xsync = SynchronizePermute(rawMat,nodeCnt,32,'sync');
-%                 timsCost = toc(tStart)
-%                 accSYN = cal_pair_graph_accuracy(Xsync,affinity.GT,target.config.nOutlier,nodeCnt,32);
-%                 scrSYN = cal_pair_graph_score(Xsync,affinity.GT,nodeCnt,32);
-%                 conSYN = cal_pair_graph_consistency(Xsync,nodeCnt,32,0);
-%                 results = ['The results of SYNC on 32 graphs, accuracy:',num2str(mean(accSYN(:))),', score:',num2str(mean(scrSYN(:))),', consistency:',num2str(mean(conSYN(:)))];
-%                 disp(results);
+                %                 tStart = tic;
+                %                 Xsync = SynchronizePermute(rawMat,nodeCnt,32,'sync');
+                %                 timsCost = toc(tStart)
+                %                 accSYN = cal_pair_graph_accuracy(Xsync,affinity.GT,target.config.nOutlier,nodeCnt,32);
+                %                 scrSYN = cal_pair_graph_score(Xsync,affinity.GT,nodeCnt,32);
+                %                 conSYN = cal_pair_graph_consistency(Xsync,nodeCnt,32,0);
+                %                 results = ['The results of SYNC on 32 graphs, accuracy:',num2str(mean(accSYN(:))),', score:',num2str(mean(scrSYN(:))),', consistency:',num2str(mean(conSYN(:)))];
+                %                 disp(results);
             end
             
             %% multiple incremental tests
-            if 1 
+            if 1
                 IMGMcount = 10;
                 scrResult = zeros(3,IMGMcount);
                 accResult = zeros(3, IMGMcount);
@@ -442,7 +445,7 @@ for testk = 1:testCnt
                 end
             end
             a = 1;
-           %%
+            %%
             % now compute the performance
             for algk = 1:algCnt
                 if algSet.algEnable(algk)==0||isempty(X{algk}),continue;end
@@ -471,53 +474,53 @@ for testk = 1:testCnt
         inlierAcc(parak,testk) = inlierAcc(parak,testk)/subParaCnt;
     end % for paraCnt
     
-% rename the algorithm names to be more friendly
-for i=1:length(algSet.algNameSet)
-    if strcmp(target.config.testType,'massOutlier')
-        algSet.algNameSetDisplay{cao_Idx} = 'cao^{cst}';
-        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSet{i},'_s','^{sim}');
-        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSetDisplay{i},'o_','o-');
-        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSetDisplay{i},'c_','c^{cst}'); 
-    else
-        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSet{i},'_','-');
-        if algSet.algNameSetDisplay{i}(end)=='-'
-            algSet.algNameSetDisplay{i}(end) = '*';
+    % rename the algorithm names to be more friendly
+    for i=1:length(algSet.algNameSet)
+        if strcmp(target.config.testType,'massOutlier')
+            algSet.algNameSetDisplay{cao_Idx} = 'cao^{cst}';
+            algSet.algNameSetDisplay{i} = strrep(algSet.algNameSet{i},'_s','^{sim}');
+            algSet.algNameSetDisplay{i} = strrep(algSet.algNameSetDisplay{i},'o_','o-');
+            algSet.algNameSetDisplay{i} = strrep(algSet.algNameSetDisplay{i},'c_','c^{cst}');
+        else
+            algSet.algNameSetDisplay{i} = strrep(algSet.algNameSet{i},'_','-');
+            if algSet.algNameSetDisplay{i}(end)=='-'
+                algSet.algNameSetDisplay{i}(end) = '*';
+            end
         end
     end
-end
-
-% print out the performance for different algorithms
-
-algNamePreSpace = '                    ';
-fprintf('--------------------------------------------------------------test %02d performance-------------------------------------------------------------------\n',testk);
-fprintf(fidPerf,'test%02d\n',testk);
-fprintf(algNamePreSpace);
-fprintf(fidPerf,',,');
-for algk=1:algCnt
-    if algSet.algEnable(algk)==0,continue;end
-    fprintf([algSet.algNameSetDisplay{algk},algNameSepSpace]);
-    fprintf(fidPerf,[algSet.algNameSetDisplay{algk},',,,,']);
-end
-fprintf('\n');fprintf(fidPerf,'\n');
-fprintf('grh# itr#  ');fprintf(fidPerf,'grh#, itr#');
-for algk=1:algCnt
-    if algSet.algEnable(algk)==0,continue;end
-    fprintf(' acc   scr   con   tim   ');
-    fprintf(fidPerf,', acc,  score, consis, time');
-end
-fprintf('\n');fprintf(fidPerf,'\n');
-for parak=1:paraCnt%graph #
-    viewCnt=graphRange(parak);
-    fprintf(' %02d   %02d ',viewCnt,iterRange);
-    fprintf(fidPerf,' %02d,  %02d',viewCnt,iterRange);
+    
+    % print out the performance for different algorithms
+    
+    algNamePreSpace = '                    ';
+    fprintf('--------------------------------------------------------------test %02d performance-------------------------------------------------------------------\n',testk);
+    fprintf(fidPerf,'test%02d\n',testk);
+    fprintf(algNamePreSpace);
+    fprintf(fidPerf,',,');
     for algk=1:algCnt
         if algSet.algEnable(algk)==0,continue;end
-        fprintf('| %.3f %.3f %.3f %.3f',accAve(parak,algk,testk),scrAve(parak,algk,testk),conPairAve(parak,algk,testk),timAve(parak,algk,testk));
-        fprintf(fidPerf,', %.3f, %.3f, %.3f, %.3f',accAve(parak,algk,testk),scrAve(parak,algk,testk),conPairAve(parak,algk,testk),timAve(parak,algk,testk));% fprintf(cc,  score, consis
+        fprintf([algSet.algNameSetDisplay{algk},algNameSepSpace]);
+        fprintf(fidPerf,[algSet.algNameSetDisplay{algk},',,,,']);
     end
-    fprintf('\n');
-    fprintf(fidPerf,'\n');
-end
+    fprintf('\n');fprintf(fidPerf,'\n');
+    fprintf('grh# itr#  ');fprintf(fidPerf,'grh#, itr#');
+    for algk=1:algCnt
+        if algSet.algEnable(algk)==0,continue;end
+        fprintf(' acc   scr   con   tim   ');
+        fprintf(fidPerf,', acc,  score, consis, time');
+    end
+    fprintf('\n');fprintf(fidPerf,'\n');
+    for parak=1:paraCnt%graph #
+        viewCnt=graphRange(parak);
+        fprintf(' %02d   %02d ',viewCnt,iterRange);
+        fprintf(fidPerf,' %02d,  %02d',viewCnt,iterRange);
+        for algk=1:algCnt
+            if algSet.algEnable(algk)==0,continue;end
+            fprintf('| %.3f %.3f %.3f %.3f',accAve(parak,algk,testk),scrAve(parak,algk,testk),conPairAve(parak,algk,testk),timAve(parak,algk,testk));
+            fprintf(fidPerf,', %.3f, %.3f, %.3f, %.3f',accAve(parak,algk,testk),scrAve(parak,algk,testk),conPairAve(parak,algk,testk),timAve(parak,algk,testk));% fprintf(cc,  score, consis
+        end
+        fprintf('\n');
+        fprintf(fidPerf,'\n');
+    end
 end % for testCnt
 fprintf('--------------------------------------------------------------overall performance-------------------------------------------------------------------\n');
 fprintf(fidPerf,'overall mean\n');
@@ -525,7 +528,7 @@ fprintf(algNamePreSpace);
 fprintf(fidPerf,',,');
 for algk=1:algCnt
     if algSet.algEnable(algk)==0,continue;end
-    fprintf([algSet.algNameSetDisplay{algk},algNameSepSpace]);  
+    fprintf([algSet.algNameSetDisplay{algk},algNameSepSpace]);
     fprintf(fidPerf,[algSet.algNameSetDisplay{algk},',,,,']);
 end
 fprintf('\n');fprintf(fidPerf,'\n');

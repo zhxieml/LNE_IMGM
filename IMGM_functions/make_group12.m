@@ -1,24 +1,30 @@
 function [group1 group2] = make_group12(matchList)
 % make group1 and group2 based on the match list
-% group1 = # of matches by ( # of groups in feat1 )
-% group2 = # of matches by ( # of groups in feat2 )
+% group1 = ( # of matches ) by ( # of groups in feat1 )
+% group2 = ( # of matches ) by ( # of groups in feat2 )
 
-nMatch = size(matchList,1);
+nMatch = size(matchList,2);
 
-featList = matchList(:,1);
+featList = matchList(1,:);
 featList_unique = unique(featList);
 nGroup = length(featList_unique);
-group = logical(sparse(nMatch,nGroup));
-for i=1:nGroup
-    group( find(featList == featList_unique(i)), i) = true;
-end
-group1 = group;
+% group = logical(sparse(nGroup,nMatch));
+% group = sparse(nGroup,nMatch);
+group = logical(zeros(nGroup,nMatch));
 
-featList = matchList(:,2);
+for i=1:nGroup
+    group(i, find(featList == featList_unique(i))) = true;
+end
+group1 = group';
+
+featList = matchList(2,:);
 featList_unique = unique(featList);
 nGroup = length(featList_unique);
-group = logical(sparse(nMatch,nGroup));
+% group = logical(sparse(nGroup,nMatch));
+% group = sparse(nGroup,nMatch);
+group = logical(zeros(nGroup,nMatch));
+
 for i=1:nGroup
-    group( find(featList == featList_unique(i)), i) = true;
+    group(i, find(featList == featList_unique(i))) = true;
 end
-group2 = group;
+group2 = group';
