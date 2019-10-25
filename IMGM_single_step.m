@@ -84,7 +84,7 @@ function [X, hyperGraph] = IMGM_single_step(globalVar, affScore, rawMat, hyperGr
         X(U+1:U+nodeCnt, R+1:R+nodeCnt) = Xur;
         % reverse tranform
         X(R+1:R+nodeCnt, U+1:U+nodeCnt)= Xur';
-        affScore(u, r) = Xur_dis'*(globalVar.K(u, r)*Xur_dis);
+        affScore(u, r) = Xur_dis'*(cell2mat(globalVar.K(u, r))*Xur_dis);
         affScore(r, u) = affScore(u, r);
     end
 end

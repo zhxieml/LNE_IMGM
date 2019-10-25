@@ -42,7 +42,7 @@ param = struct( ...
 );
 E12 = ones(nP1,nP2);
 [L12(:,1) L12(:,2)] = find(E12);
-[group1 group2] = make_group12(L12);
+[group1 group2] = make_group12(L12');
 
 %% parameter structure -> parameter value
 strField = fieldnames(param);

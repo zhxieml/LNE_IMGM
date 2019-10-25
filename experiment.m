@@ -216,33 +216,33 @@ for testk = 1:testCnt
                 sigma = 0;
                 simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                 tStart = tic;
-%                 Xmatching = IMGM_old(simAP, rawMatTmp, param);
-%                 timsCost = toc(tStart)
-%                 accIMGM = cal_pair_graph_accuracy(Xmatching,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-%                 scrIMGM = cal_pair_graph_score(Xmatching,affinity.GT,nodeCnt,graphCnt);
-%                 conIMGM = cal_pair_graph_consistency(Xmatching,nodeCnt,graphCnt,0);
-%                 results = ['The results of IMGM on 50 graphs, accuracy:',num2str(mean(accIMGM(:))),', score:',num2str(mean(scrIMGM(:))),', consistency:',num2str(mean(conIMGM(:)))];
-%                 disp(results);
-%                 
-%                 scrDenomCurrent = max(max(scrDenomMatInCnt(1:end,1:end)));
-%                 tStart = tic;
-%                 Xoriginal = CAO(rawMatTmp, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
-%                 timsCost = toc(tStart)
-%                 accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-%                 scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
-%                 conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
-%                 results = ['The results of CAO-R on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
-%                 disp(results);
-%                 
-%                 tStart = tic;
-%                 Xoriginal = CAO(rawMat, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
-%                 timsCost = toc(tStart)
-%                 accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-%                 scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
-%                 conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
-%                 results = ['The results of CAO on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
-%                 disp(results);
+                tStart = tic;
+                Xmatching = IMGM_old(simAP, rawMatTmp, param);
+                timsCost = toc(tStart)
+                accIMGM = cal_pair_graph_accuracy(Xmatching,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+                scrIMGM = cal_pair_graph_score(Xmatching,affinity.GT,nodeCnt,graphCnt);
+                conIMGM = cal_pair_graph_consistency(Xmatching,nodeCnt,graphCnt,0);
+                results = ['The results of IMGM on 50 graphs, accuracy:',num2str(mean(accIMGM(:))),', score:',num2str(mean(scrIMGM(:))),', consistency:',num2str(mean(conIMGM(:)))];
+                disp(results);
+                
+                scrDenomCurrent = max(max(scrDenomMatInCnt(1:end,1:end)));
+                tStart = tic;
+                Xoriginal = CAO(rawMatTmp, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
+                timsCost = toc(tStart)
+                accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+                scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
+                conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
+                results = ['The results of CAO-R on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
+                disp(results);
+                
+                tStart = tic;
+                Xoriginal = CAO(rawMat, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
+                timsCost = toc(tStart)
+                accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+                scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
+                conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
+                results = ['The results of CAO on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
+                disp(results);
                 
                 %%%%%% IMGM_new
 %                 hyperGraph = Prim(simAP);
