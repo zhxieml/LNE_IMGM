@@ -245,18 +245,18 @@ for testk = 1:testCnt
 %                 disp(results);
                 
                 %%%%%% IMGM_new
-                hyperGraph = Prim(simAP);
-                hyperGraph(param.N:end, :) = 0;
-                hyperGraph(:, param.N:end) = 0;
-                
-                tStart = tic;
-                Xoriginal = IMGM_single_step(affinity, simAP, rawMatTmp, hyperGraph, param);
-                timsCost = toc(tStart)
-                accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-                scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
-                conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
-                results = ['The results of IMGM_new on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
-                disp(results);
+%                 hyperGraph = Prim(simAP);
+%                 hyperGraph(param.N:end, :) = 0;
+%                 hyperGraph(:, param.N:end) = 0;
+%                 
+%                 tStart = tic;
+%                 Xoriginal = IMGM_single_step(affinity, simAP, rawMatTmp, hyperGraph, param);
+%                 timsCost = toc(tStart)
+%                 accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+%                 scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
+%                 conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
+%                 results = ['The results of IMGM_new on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
+%                 disp(results);
             end
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
