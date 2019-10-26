@@ -25,7 +25,7 @@ function Ku = dfs(K, X, hyperGraph, iu, ir, graphOf, propRate, minPropRate, node
             Xu(:, :, iF) = X(f+1:f+nodeCnt, t+1:t+nodeCnt)*Xu(:, :, iT); % Xu = Xft * Xtu
             % compute affinity matrix
             Ffu = kron(Xu(:, :, iF), eye(nodeCnt));
-            Ku = Ku + stkPropRate(top)*(Ffu'*(cell2mat(K(graphOf(ir), graphOf(iF)))*Ffu)); 
+            Ku = Ku + stkPropRate(top)*(Ffu'*(K{graphOf(ir), graphOf(iF)}*Ffu)); 
             % update stack
             stk(top+1) = iF;
             stkPropRate(top+1) = stkPropRate(top)*propRate;

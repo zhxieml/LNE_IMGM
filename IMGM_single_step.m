@@ -48,7 +48,6 @@ function [X, hyperGraph] = IMGM_single_step(globalVar, affScore, rawMat, hyperGr
     %% apply Prim algorithm to find MST
     hyperGraph(visited, visited) = 0;
     searched = zeros(1, graphCnt, 'logical');
-    searched(iNewGraph) = true;
     [~, I] = sort(affScore(:), 'descend');
     
     I = int32(I);
@@ -56,7 +55,7 @@ function [X, hyperGraph] = IMGM_single_step(globalVar, affScore, rawMat, hyperGr
     
     a = mod(I - 1, graphCnt) + 1;
     b = idivide(I - 1, graphCnt) + 1;
-    
+    searched(a(1)) = true;
     for ii = 1:length(I)
         if searched(a(ii)) && visited(b(ii)) && ~searched(b(ii))
             searched(b(ii)) = 1;
@@ -75,7 +74,7 @@ function [X, hyperGraph] = IMGM_single_step(globalVar, affScore, rawMat, hyperGr
         r = graphSet(ir);
         Ku = dfs(globalVar.K, X, hyperGraph, iu, ir, graphSet, param.propRate, param.minPropRate, nodeCnt);
         Kr = dfs(globalVar.K, X, hyperGraph, iu, ir, graphSet, param.propRate, param.minPropRate, nodeCnt);
-        K = cell2mat(globalVar.K(u, r)) + Kr + transF*(Ku*transF);
+        K = globalVar.K{u, r} + Kr + transF*(Ku*transF);
         Xur_raw = RRWM(K, group1, group2);
         Xur_dis = greedyMapping(Xur_raw, group1, group2);
         Xur = reshape(Xur_dis, nodeCnt, nodeCnt);
@@ -84,7 +83,33 @@ function [X, hyperGraph] = IMGM_single_step(globalVar, affScore, rawMat, hyperGr
         X(U+1:U+nodeCnt, R+1:R+nodeCnt) = Xur;
         % reverse tranform
         X(R+1:R+nodeCnt, U+1:U+nodeCnt)= Xur';
-        affScore(u, r) = Xur_dis'*(cell2mat(globalVar.K(u, r))*Xur_dis);
+        affScore(u, r) = Xur_dis'*(globalVar.K{u, r}*Xur_dis);
         affScore(r, u) = affScore(u, r);
     end
+    % make consistent
+    stk = zeros(1, graphCnt);
+    visited(:) = 0;
+    top = 1;
+    stk(top) = iNewGraph;
+    while(top >= 1)
+        t = stk(top);
+        visited(t) = true;
+        notVisited = hyperGraph(t, :) & (~visited);
+        if (~nnz(notVisited))
+            top = top - 1;
+        else
+            % t is the father point, f is the adjecent point
+            f = find(notVisited, 1);
+            R = (iNewGraph-1)*nodeCnt; %root
+            T = (t-1)*nodeCnt;
+            F = (f-1)*nodeCnt;
+            Xgf = X(R+1:R+nodeCnt, T+1:T+nodeCnt)*X(T+1:T+nodeCnt, F+1:F+nodeCnt);
+            X(R+1:R+nodeCnt, F+1:F+nodeCnt) = Xgf;
+            X(F+1:F+nodeCnt, R+1:R+nodeCnt) = Xgf';
+            % update stack
+            stk(top+1) = f;
+            top = top + 1;
+        end
+    end
+    
 end
