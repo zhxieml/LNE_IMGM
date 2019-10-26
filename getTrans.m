@@ -1,9 +1,4 @@
 function Trans = getTrans(np)
-%myFun - Description
-%
-% Syntax: output = myFun(input)
-%
-% Long description
 np = uint32(np);
 sz = np*np;
 Trans = zeros(np*np);

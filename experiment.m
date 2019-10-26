@@ -199,6 +199,14 @@ for testk = 1:testCnt
             param.bVerbose = 0;
             param.maxNumSearch = 20;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            param.subMethodParam.name = 'DPMC';
+            param.subMethodParam.useCstDecay = 1;
+            param.subMethodParam.cstDecay  = 0.7;
+            param.subMethodParam.useWeightedDecay  = 0;
+            param.subMethodParam.iterMax = 5;
+            
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             scrDenomCurrent = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
             
@@ -245,11 +253,8 @@ for testk = 1:testCnt
 %                 disp(results);
                 
                 %%%%%% IMGM_new
-                hyperGraph = zeros(affinity.graphCnt, affinity.graphCnt);
-                hyperGraph(1:param.N, 1:param.N) = Prim(simAP(1:param.N, 1:param.N));
                 tStart = tic;
-                Xoriginal = IMGM_single_step(affinity, simAP, rawMatTmp, hyperGraph, param);
-                Xoriginal = make_consistent(hyperGraph, Xoriginal);
+                Xoriginal = IMGM_single_step(affinity, simAP, rawMatTmp, param);
                 timsCost = toc(tStart)
                 accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
                 scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
@@ -347,20 +352,12 @@ for testk = 1:testCnt
                     % calculate the incremental matching with IMGM
                     if i == 1
                         imgmPrevMatching = baseMat;
-                        
-                        hyperGraph = zeros(graphCnt, graphCnt);
-                        hyperGraph(1:param.N, 1:param.N) = Prim(simAP(1:param.N, 1:param.N));
                     end
                     imgmMatTmp = rawMat(1:end-nodeCnt*(IMGMcount - i),1:end-nodeCnt*(IMGMcount - i));
                     imgmMatTmp(1:end-nodeCnt,1:end-nodeCnt)=imgmPrevMatching;
                     
                     tStart = tic;
-                    simAPTmp = simAP;
-                    simAPTmp(param.N+2:graphCnt, :) = 0;
-                    simAPTmp(:, param.N+2:graphCnt) = 0;
-                    [imgmIncreMatching, hyperGraph] = IMGM_single_step(affinity, simAPTmp, imgmMatTmp, hyperGraph, param);
-                    imgmIncreMatching = make_consistent(hyperGraph, imgmIncreMatching);
-
+                    imgmIncreMatching = IMGM_single_step(affinity, simAP, imgmMatTmp, param);
                     tEnd = toc(tStart);
                     imgmPrevMatching = imgmIncreMatching;
                     
