@@ -1,7 +1,7 @@
 function hyperGraph = Prim(affScore)
     graphCnt = size(affScore, 1);
     graphCnt = int32(graphCnt);
-    hyperGraph = zeros(graphCnt, graphCnt);
+    hyperGraph = zeros(graphCnt, graphCnt, 'logical');
     
     searched = zeros(1, graphCnt, 'logical');
     searched(1) = true;
