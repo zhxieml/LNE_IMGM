@@ -280,7 +280,7 @@ for testk = 1:testCnt
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
             if test_multiple_increment
-                IMGMcount = 48;
+                IMGMcount = 20;
                 scrResult = zeros(4,IMGMcount);
                 accResult = zeros(4, IMGMcount);
                 conResult = zeros(4, IMGMcount);
