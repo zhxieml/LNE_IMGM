@@ -41,11 +41,15 @@ if strcmp(target.config.testType,'massOutlier')% outlier test, see Fig.5(b) in t
     graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 else
     algNameSepSpace = '                    ';
-    algSet.algNameSet = {'rrwm','cao_','cao','cao_c_','cao_c','cao_uc_','cao_uc','cao_pc_','cao_pc','mOpt','mSync'};
-    algSet.algEnable = [1,1,1,1,1,1,1,1,1,1,1];
-    algSet.algColor = {rrwmClr,caoClr,caoClr,cao_cClr,cao_cClr,cao_ucClr,cao_ucClr,cao_pcClr,cao_pcClr,iccvClr,nipsClr};
-    algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-','-','-'};
-    algSet.algMarker = {'.','.','.','.','.','.','.','.','.','.','.'};
+    algSet.algNameSet = {'cao_','cao','IMGM','IMGM_new'};
+    algSet.algEnable = [1,1,1,1];
+    algSet.algColor = {caoClr,caoClr,caoClr,caoClr};
+    algSet.algLineStyle = {'--','--','-','--'};
+    algSet.algMarker = {'.','.','.','.'};%     algSet.algNameSet = {'rrwm','cao_','cao','cao_c_','cao_c','cao_uc_','cao_uc','cao_pc_','cao_pc','mOpt','mSync','IMGM_new'};
+%     algSet.algEnable = [1,1,1,1,1,1,1,1,1,1,1,1];
+%     algSet.algColor = {rrwmClr,caoClr,caoClr,cao_cClr,cao_cClr,cao_ucClr,cao_ucClr,cao_pcClr,cao_pcClr,iccvClr,nipsClr,};
+%     algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-','-','-'};
+%     algSet.algMarker = {'.','.','.','.','.','.','.','.','.','.','.'};
     target.config.bGraphMatch = 1;
     target.config.inCntType = 'all';% set 'all' for "only a few outlier case", e.g. Fig.1&2&3&4
     target.config.category = 'deform';%'deform','outlier','density','complete'
@@ -283,7 +287,7 @@ for testk = 1:testCnt
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
             if test_multiple_increment
-                IMGMcount = 30;
+                IMGMcount = 2;
                 scrResult = zeros(4,IMGMcount);
                 accResult = zeros(4, IMGMcount);
                 conResult = zeros(4, IMGMcount);
@@ -406,9 +410,9 @@ for testk = 1:testCnt
                 if algSet.algEnable(algk)==0||isempty(X{algk}),continue;end
                 txt = algSet.algNameSet(algk);
                 % compute the accuracy, affinity score, consistency for each pair of graphs
-                accMatPairGraph{parak,algk,testk} = cal_pair_graph_accuracy(X{algk},affinity.Xgt,target.config.nOutlier,nodeCnt,viewCnt);
-                scrMatPairGraph{parak,algk,testk} = cal_pair_graph_score(X{algk},affinity.Xgt,nodeCnt,viewCnt);
-                conMatPairGraph{parak,algk,testk} = cal_pair_graph_consistency(X{algk},nodeCnt,viewCnt,0);
+%                 accMatPairGraph{parak,algk,testk} = cal_pair_graph_accuracy(X{algk},affinity.Xgt,target.config.nOutlier,nodeCnt,viewCnt);
+%                 scrMatPairGraph{parak,algk,testk} = cal_pair_graph_score(X{algk},affinity.Xgt,nodeCnt,viewCnt);
+%                 conMatPairGraph{parak,algk,testk} = cal_pair_graph_consistency(X{algk},nodeCnt,viewCnt,0);
                 % the overall accuracy and affinity score, note the diagnal
                 % of xxxMatPairGraph is dismissed because they are meaningless
                 accAve(parak,algk,testk) = accAve(parak,algk,testk)+mean(accMatPairGraph{parak,algk,testk}(logical(triu(ones(size(accMatPairGraph{parak,algk,testk})),1))));

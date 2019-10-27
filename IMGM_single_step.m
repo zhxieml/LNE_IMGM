@@ -58,7 +58,7 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
         % TODO:not finished
         % function P = CAO_test(rawMat,nodeCnt,graphCnt,iterMax,scrDenom,optType,useCstInlier)
         subIndies = getSubIndices(included);
-        X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,nSubSet,method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
+        X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'DPMC'
         X = DPMC(globalVar.K, rawMat, affScore, nodeCnt, included, method);
     otherwise
