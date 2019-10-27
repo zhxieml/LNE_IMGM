@@ -127,8 +127,8 @@ fprintf('\n');fprintf(fidPerf,'\n');
 inlierAcc = zeros(paraCnt,testCnt);
 estErr = zeros(testCnt,1);
 
-test_one_increment = true;
-test_multiple_increment = false;
+test_one_increment = false;
+test_multiple_increment = true;
 
 algpar.algMethod = 'RRWM_old';
 
@@ -224,27 +224,28 @@ for testk = 1:testCnt
                 conIMGM = cal_pair_graph_consistency(Xmatching,nodeCnt,graphCnt,0);
                 results = ['The results of IMGM on 50 graphs, accuracy:',num2str(mean(accIMGM(:))),', score:',num2str(mean(scrIMGM(:))),', consistency:',num2str(mean(conIMGM(:)))];
                 disp(results);
-                
-                scrDenomCurrent = max(max(scrDenomMatInCnt(1:end,1:end)));
-                tStart = tic;
-                Xoriginal = CAO(rawMatTmp, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
-                timsCost = toc(tStart)
-                accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-                scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
-                conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
-                results = ['The results of CAO-R on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
-                disp(results);
-                
-                tStart = tic;
-                Xoriginal = CAO(rawMat, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
-                timsCost = toc(tStart)
-                accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-                scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
-                conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
-                results = ['The results of CAO on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
-                disp(results);
+%                 
+%                 scrDenomCurrent = max(max(scrDenomMatInCnt(1:end,1:end)));
+%                 tStart = tic;
+%                 Xoriginal = CAO(rawMatTmp, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
+%                 timsCost = toc(tStart)
+%                 accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+%                 scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
+%                 conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
+%                 results = ['The results of CAO-R on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
+%                 disp(results);
+%                 
+%                 tStart = tic;
+%                 Xoriginal = CAO(rawMat, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair',1);
+%                 timsCost = toc(tStart)
+%                 accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+%                 scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
+%                 conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
+%                 results = ['The results of CAO on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
+%                 disp(results);
                 
                 %%%%%% IMGM_new
+<<<<<<< HEAD
 %                 hyperGraph = Prim(simAP);
 %                 hyperGraph(param.N:end, :) = 0;
 %                 hyperGraph(:, param.N:end) = 0;
@@ -257,15 +258,28 @@ for testk = 1:testCnt
 %                 conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
 %                 results = ['The results of IMGM_new on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
 %                 disp(results);
+=======
+                hyperGraph = zeros(affinity.graphCnt, affinity.graphCnt);
+                hyperGraph(1:param.N, 1:param.N) = Prim(simAP(1:param.N, 1:param.N));
+                tStart = tic;
+                Xoriginal = IMGM_single_step(affinity, simAP, rawMatTmp, hyperGraph, param);
+                Xoriginal = make_consistent(hyperGraph, Xoriginal);
+                timsCost = toc(tStart)
+                accCAO = cal_pair_graph_accuracy(Xoriginal,affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+                scrCAO = cal_pair_graph_score(Xoriginal,affinity.GT,nodeCnt,graphCnt);
+                conCAO = cal_pair_graph_consistency(Xoriginal,nodeCnt,graphCnt,0);
+                results = ['The results of IMGM_new on 50 graphs, accuracy:',num2str(mean(accCAO(:))),', score:',num2str(mean(scrCAO(:))),', consistency:',num2str(mean(conCAO(:)))];
+                disp(results);
+>>>>>>> 987fcfb0e46e3602ca2611c4cf7423563b2f63cd
             end
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
             if test_multiple_increment
-                IMGMcount = 10;
-                scrResult = zeros(3,IMGMcount);
-                accResult = zeros(3, IMGMcount);
-                conResult = zeros(3, IMGMcount);
-                timeResult = zeros(3, IMGMcount);
+                IMGMcount = 48;
+                scrResult = zeros(4,IMGMcount);
+                accResult = zeros(4, IMGMcount);
+                conResult = zeros(4, IMGMcount);
+                timeResult = zeros(4, IMGMcount);
                 baseGraphCnt = graphCnt - IMGMcount;
 
                 for i = 1:IMGMcount
@@ -314,16 +328,16 @@ for testk = 1:testCnt
                     conResult(1,i)=mean(conRawCAO(:));
                     timeResult(1,i)=tEnd;
                     
-                    % calculate the incremental matching with IMGM
+                    % calculate the incremental matching with IMGM_old
                     % previous matching: imgmPrevMatching
                     if i == 1
-                        imgmPrevMatching = baseMat;
+                        imgmOldPrevMatching = baseMat;
                     end
-                    imgmMatTmp = rawMat(1:end-nodeCnt*(IMGMcount - i),1:end-nodeCnt*(IMGMcount - i));
-                    imgmMatTmp(1:end-nodeCnt,1:end-nodeCnt)=imgmPrevMatching;
+                    imgmOldMatTmp = rawMat(1:end-nodeCnt*(IMGMcount - i),1:end-nodeCnt*(IMGMcount - i));
+                    imgmOldMatTmp(1:end-nodeCnt,1:end-nodeCnt)=imgmOldPrevMatching;
                     
-                    scrDenomMatInCntTmp = cal_pair_graph_inlier_score(imgmMatTmp,affinity.GT(1:nodeCnt*(baseGraphCnt+i),1:nodeCnt*(baseGraphCnt+i)),nodeCnt,baseGraphCnt+i,nodeCnt);
-                    conDenomMatInCntTmp = cal_pair_graph_consistency(imgmMatTmp,nodeCnt,baseGraphCnt+i,0);
+                    scrDenomMatInCntTmp = cal_pair_graph_inlier_score(imgmOldMatTmp,affinity.GT(1:nodeCnt*(baseGraphCnt+i),1:nodeCnt*(baseGraphCnt+i)),nodeCnt,baseGraphCnt+i,nodeCnt);
+                    conDenomMatInCntTmp = cal_pair_graph_consistency(imgmOldMatTmp,nodeCnt,baseGraphCnt+i,0);
                     
                     %%%%%%%%%%%%%%%%%% AP inital arguments %%%%%%%%%%%%%%%%%%
                     sigma = 0;
@@ -332,27 +346,59 @@ for testk = 1:testCnt
                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     
                     tStart = tic;
-                    imgmIncreMatching = IMGM_old(simAP, imgmMatTmp, param);
+                    imgmOldIncreMatching = IMGM_old(simAP, imgmOldMatTmp, param);
                     tEnd = toc(tStart);
-                    imgmPrevMatching = imgmIncreMatching;
+                    imgmOldPrevMatching = imgmOldIncreMatching;
                     
-                    accImgmU = cal_pair_graph_accuracy(imgmIncreMatching,affinity.GT,target.config.nOutlier,nodeCnt,baseGraphCnt+i);
-                    scrImgmU = cal_pair_graph_score(imgmIncreMatching,affinity.GT,nodeCnt,baseGraphCnt+i);
-                    conImgmU = cal_pair_graph_consistency(imgmIncreMatching,nodeCnt,baseGraphCnt+i,0);
+                    accImgmU = cal_pair_graph_accuracy(imgmOldIncreMatching,affinity.GT,target.config.nOutlier,nodeCnt,baseGraphCnt+i);
+                    scrImgmU = cal_pair_graph_score(imgmOldIncreMatching,affinity.GT,nodeCnt,baseGraphCnt+i);
+                    conImgmU = cal_pair_graph_consistency(imgmOldIncreMatching,nodeCnt,baseGraphCnt+i,0);
                     
                     accResult(3,i)=mean(accImgmU(:));
                     scrResult(3,i)=mean(scrImgmU(:));
                     conResult(3,i)=mean(conImgmU(:));
                     timeResult(3,i)=tEnd;
                     
-                    a = 1;
+                    % calculate the incremental matching with IMGM
+                    if i == 1
+                        imgmPrevMatching = baseMat;
+                        
+                        hyperGraph = zeros(graphCnt, graphCnt);
+                        hyperGraph(1:param.N, 1:param.N) = Prim(simAP(1:param.N, 1:param.N));
+                    end
+                    imgmMatTmp = rawMat(1:end-nodeCnt*(IMGMcount - i),1:end-nodeCnt*(IMGMcount - i));
+                    imgmMatTmp(1:end-nodeCnt,1:end-nodeCnt)=imgmPrevMatching;
+                    
+                    tStart = tic;
+                    simAPTmp = simAP;
+                    simAPTmp(param.N+2:graphCnt, :) = 0;
+                    simAPTmp(:, param.N+2:graphCnt) = 0;
+                    [imgmIncreMatching, hyperGraph] = IMGM_single_step(affinity, simAPTmp, imgmMatTmp, hyperGraph, param);
+                    imgmIncreMatching = make_consistent(hyperGraph, imgmIncreMatching);
+
+                    tEnd = toc(tStart);
+                    imgmPrevMatching = imgmIncreMatching;
+                    
+                    accImgm = cal_pair_graph_accuracy(imgmIncreMatching,affinity.GT,target.config.nOutlier,nodeCnt,baseGraphCnt+i);
+                    scrImgm = cal_pair_graph_score(imgmIncreMatching,affinity.GT,nodeCnt,baseGraphCnt+i);
+                    conImgm = cal_pair_graph_consistency(imgmIncreMatching,nodeCnt,baseGraphCnt+i,0);
+                    
+                    accResult(4,i)=mean(accImgm(:));
+                    scrResult(4,i)=mean(scrImgm(:));
+                    conResult(4,i)=mean(conImgm(:));
+                    timeResult(4,i)=tEnd;
+                    
+%                     a = 1;
+                    
+                    fprintf('The accuracy is %4.3f\n', accResult(:, i));
+                    fprintf('Start from %d graphs, %d graphs incremented\n', baseGraphCnt, i);
                 end
             end
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
 
 
             % now compute the performance
-            a = 1;
+%             a = 1;
             for algk = 1:algCnt
                 if algSet.algEnable(algk)==0||isempty(X{algk}),continue;end
                 txt = algSet.algNameSet(algk);
