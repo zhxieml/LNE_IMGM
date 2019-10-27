@@ -3,9 +3,8 @@ function X = DPMC(K, X, affScore, nodeCnt, subSet, param)
 % 
     S = affScore(subSet, subSet);
     MST = Prim(S);
-    gama = zeros(size(MST, 1));
     M = getTrans(nodeCnt);
-    [xDim, yDim] = meshgrid(1:np, 1:np);
+    [xDim, yDim] = meshgrid(1:nodeCnt, 1:nodeCnt);
     matchlist = [xDim(:), yDim(:)]';
     [group1, group2] = make_group12(matchlist);
     if param.useCstDecay
@@ -26,8 +25,8 @@ function X = DPMC(K, X, affScore, nodeCnt, subSet, param)
             r = subSet(ir);
             Ku = dfs(K, X, MST, gama, subSet, iu, ir, nodeCnt);
             Kr = dfs(K, X, MST, gama, subSet, ir, iu, nodeCnt);
-            K = K{u, r} + Kr + M*(Ku*M);
-            Xur_raw = RRWM(K, group1, group2);
+            Kur = K{u, r} + Kr + M*(Ku*M);
+            Xur_raw = RRWM(Kur, group1, group2);
             Xur_flat = greedyMapping(Xur_raw, group1, group2);
             Xur = reshape(Xur_flat, nodeCnt, nodeCnt);
             U = (u-1)*nodeCnt;
@@ -38,5 +37,5 @@ function X = DPMC(K, X, affScore, nodeCnt, subSet, param)
         end
     end
     % make full consistent
-    X = make_consistent(MST, X, subSet);
+    X = make_consistent(MST, X, nodeCnt, subSet);
 end

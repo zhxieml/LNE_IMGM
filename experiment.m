@@ -194,8 +194,7 @@ for testk = 1:testCnt
             param.method = 1;
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            param.propRate = 0.5;
-            param.minPropRate = 0.21;
+            % param for IMGM_new
             param.bVerbose = 0;
             param.maxNumSearch = 20;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -265,7 +264,7 @@ for testk = 1:testCnt
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
             if test_multiple_increment
-                IMGMcount = 48;
+                IMGMcount = 30;
                 scrResult = zeros(4,IMGMcount);
                 accResult = zeros(4, IMGMcount);
                 conResult = zeros(4, IMGMcount);

@@ -20,8 +20,9 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
     centerScore = affScore(newGraph, :).*double(isCenter);
     [~, bestCenter] = max(centerScore);
     %% match members of all edge points of best center
-    nodeScore = affScore(newGraph, :).*double(~isCenter);
-    nodeScore(bestCenter) = affScore(newGraph, bestCenter);
+    isConsidered = MST(bestCenter, :) & ~isCenter;
+    isConsidered(bestCenter) = true;
+    nodeScore = affScore(newGraph, :).*double(isConsidered);
     [~, bestMatch] = max(nodeScore);
 
     %% connect new graph with best match
@@ -36,7 +37,7 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
         fprintf('before improvment, match score = %.3f\n', affScore(newGraph, bestMatch));
     end
     
-    %% apply multigraph algorithms to solve matches in subSet
+    %% apply multigraph algorithms to solve matches in included
     nSubSet = param.maxNumSearch;
     % breadth first search to find nSubSet nearest graphs
     isInSubSet = bfs(MST, newGraph, nSubSet);
@@ -45,7 +46,11 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
         fprintf("bfs find %d graphs\n", nSearch);
     end
     
-    subSet = find(isInSubSet);
+    included = find(isInSubSet);
+    excluded = find(~isInSubSet);
+    % pairwise match included
+    affScore(newGraph, ~isInSubSet) = 0;
+    affScore(~isInSubSet, newGraph) = 0;
     % apply multigraph algorithms
     method = param.subMethodParam;
     switch method.name
@@ -53,14 +58,15 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
         % TODO:not finished
         X = CAO(rawMat,nodeCnt,nSubSet,param.iterMax,param.scrDenom,param.optType,param.useCstInlier);
     case 'DPMC'
-        X = DPMC(globalVar.K, rawMat, affScore, nodeCnt, subSet, method);
+        X = DPMC(globalVar.K, rawMat, affScore, nodeCnt, included, method);
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
 
     %% make consistent
     stk = zeros(1, newGraph);
-    for root = subSet
+    consistent = MST;
+    for root = included
         stk(:) = 0;
         visited = isInSubSet;
         top = 1;
@@ -78,15 +84,36 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
                 T = (t-1)*nodeCnt;
                 F = (f-1)*nodeCnt;
                 Xrf = X(R+1:R+nodeCnt, T+1:T+nodeCnt)*X(T+1:T+nodeCnt, F+1:F+nodeCnt);
-                Srf = Xrf(:)'*(globalVar.K{r, f}*Xrf(:));
-                if affScore(r, f) < Srf
+                Srf = Xrf(:)'*(globalVar.K{root, f}*Xrf(:));
+                if Srf > affScore(root, f) 
                     X(R+1:R+nodeCnt, F+1:F+nodeCnt) = Xrf;
                     X(F+1:F+nodeCnt, R+1:R+nodeCnt) = Xrf';
                 end
+                % update consistent
+                consistent(root, f) = 1;
+                consistent(f, root) = 1;
                 % update stack
                 stk(top+1) = f;
                 top = top + 1;
             end
+        end
+    end
+    [row, col] = find(~consistent(excluded, included));
+    for ii = 1:length(row)
+        a = excluded(row(ii));
+        b = included(col(ii));
+        c = included(find(consistent(a, included),1));
+        assert(~isempty(c), 'error: cannot find inter point c\n');
+        base_a = (a-1)*nodeCnt;
+        base_b = (b-1)*nodeCnt;
+        base_c = (c-1)*nodeCnt;
+        Xac = X(base_a+1:base_a+nodeCnt, base_c+1:base_c+nodeCnt);
+        Xcb = X(base_c+1:base_c+nodeCnt, base_b+1:base_b+nodeCnt);
+        Xab = Xac*Xcb;
+        Sab = Xab(:)'*(globalVar.K{a, b}*Xab(:));
+        if Sab > affScore(a, b)
+            X(base_a+1:base_a+nodeCnt, base_b+1:base_b+nodeCnt) = Xab;
+            X(base_b+1:base_b+nodeCnt, base_a+1:base_a+nodeCnt) = Xab';
         end
     end
 end
