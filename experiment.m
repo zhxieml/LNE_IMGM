@@ -187,28 +187,31 @@ for testk = 1:testCnt
             updGrhList = [cstGrhList,refConstGraph];%for consistency rank
             refGraph = updGrhList(end);
             cstCalTime = toc(tStart);
-            
+                                   
             param.n = 10; param.N = graphCnt - 1;
             param.iterMax = iterRange;
             param.visualization = 0;
             param.method = 1;
             
+            scrDenomCurrent = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            param.propRate = 0.5;
-            param.minPropRate = 0.21;
+            % param for IMGM_new
             param.bVerbose = 0;
             param.maxNumSearch = 20;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             param.subMethodParam.name = 'DPMC';
+            param.subMethodParam.name = 'CAO';
             param.subMethodParam.useCstDecay = 1;
             param.subMethodParam.cstDecay  = 0.7;
             param.subMethodParam.useWeightedDecay  = 0;
             param.subMethodParam.iterMax = 5;
+            param.subMethodParam.scrDenom = scrDenomCurrent;
+            param.subMethodParam.optType = 'pair';
+            param.subMethodParam.useCstInlier = 1;
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-            scrDenomCurrent = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
             
             if test_one_increment
                 % tStart = tic;
@@ -280,7 +283,7 @@ for testk = 1:testCnt
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
             if test_multiple_increment
-                IMGMcount = 20;
+                IMGMcount = 30;
                 scrResult = zeros(4,IMGMcount);
                 accResult = zeros(4, IMGMcount);
                 conResult = zeros(4, IMGMcount);
@@ -348,6 +351,9 @@ for testk = 1:testCnt
                     sigma = 0;
                     simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
                     param.N = baseGraphCnt + i - 1;
+                    
+                    param.subMethodParam.scrDenom = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
+
                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     
                     tStart = tic;
