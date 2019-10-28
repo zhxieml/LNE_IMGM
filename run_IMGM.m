@@ -317,7 +317,6 @@ scrDenomCurrent = max(max(scrDenomMattarget.config.inCnt(1:31,1:31)));
 currentMat = CAO(rawMat(1:end-nodeCnt,1:end-nodeCnt), nodeCnt, graphCnt-1, iterRange,scrDenomCurrent, 'pair',1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 affScore = scrDenomMattarget.config.inCnt;
 
 rawMatTmp = rawMat;
