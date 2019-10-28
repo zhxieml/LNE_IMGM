@@ -90,6 +90,8 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
                 if Srf > affScore(root, f) 
                     X(R+1:R+nodeCnt, F+1:F+nodeCnt) = Xrf;
                     X(F+1:F+nodeCnt, R+1:R+nodeCnt) = Xrf';
+                    affScore(root, f) = Srf;
+                    affScore(f, root) = Srf;
                 end
                 % update consistent
                 consistent(root, f) = 1;
@@ -116,6 +118,8 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
         if Sab > affScore(a, b)
             X(base_a+1:base_a+nodeCnt, base_b+1:base_b+nodeCnt) = Xab;
             X(base_b+1:base_b+nodeCnt, base_a+1:base_a+nodeCnt) = Xab';
+            affScore(a, b) = Sab;
+            affScore(b, a) = Sab;
         end
     end
 end

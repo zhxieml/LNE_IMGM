@@ -1,7 +1,7 @@
 %% Initialization
 clear *;clear -global *;close all;clc; clear all;
 
-init_path_experiment;
+init_path;
 
 global affinity target
 varyMinGrhCnt=4;varyMaxGrhCnt=32;grhTestCnt = 5;% 
@@ -18,7 +18,6 @@ target.config.testType = 'formal';% massOutlier
 algpar = setPairwiseSolver();
 mpmAlgPar = setMPMAlgPar;
 
-% varyMinGrhCnt=4;varyMaxGrhCnt=32;grhTestCnt = 20;
 
 target.config.database = 'synthetic';% only synthetic test is allowed here
 target.config.Sacle_2D = 0.05;
@@ -41,10 +40,10 @@ if strcmp(target.config.testType,'massOutlier')% outlier test, see Fig.5(b) in t
     graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 else
     algNameSepSpace = '                    ';
-    algSet.algNameSet = {'cao_','cao','IMGM','IMGM_new'};
+    algSet.algNameSet = {'cao','cao_raw','IMGM','IMGM_new'};
     algSet.algEnable = [1,1,1,1];
-    algSet.algColor = {caoClr,caoClr,caoClr,caoClr};
-    algSet.algLineStyle = {'--','--','-','--'};
+    algSet.algColor = {caoClr,cao_rawClr,IMGMClr,IMGM_newClr};
+    algSet.algLineStyle = {'--',':','-','-.'};
     algSet.algMarker = {'.','.','.','.'};%     algSet.algNameSet = {'rrwm','cao_','cao','cao_c_','cao_c','cao_uc_','cao_uc','cao_pc_','cao_pc','mOpt','mSync','IMGM_new'};
 %     algSet.algEnable = [1,1,1,1,1,1,1,1,1,1,1,1];
 %     algSet.algColor = {rrwmClr,caoClr,caoClr,cao_cClr,cao_cClr,cao_ucClr,cao_ucClr,cao_pcClr,cao_pcClr,iccvClr,nipsClr,};
@@ -83,16 +82,26 @@ target.config.selectGraphMask{1} = 1:graphMaxCnt;
 paraCnt=length(graphRange);
 iterCnt = length(iterRange);
 
-[~,rrwmIdx] = ismember('rrwm',algSet.algNameSet);
-[~,mpmIdx] = ismember('mpm',algSet.algNameSet);
-[~,cao_Idx] = ismember('cao_',algSet.algNameSet);[~,cao_sIdx] = ismember('cao_s',algSet.algNameSet);
+% [~,rrwmIdx] = ismember('rrwm',algSet.algNameSet);
+% [~,mpmIdx] = ismember('mpm',algSet.algNameSet);
+% [~,cao_Idx] = ismember('cao_',algSet.algNameSet);[~,cao_sIdx] = ismember('cao_s',algSet.algNameSet);
+% [~,caoIdx] = ismember('cao',algSet.algNameSet);
+% [~,cao_c_Idx] = ismember('cao_c_',algSet.algNameSet);[~,cao_c_sIdx] = ismember('cao_c_s',algSet.algNameSet);
+% [~,cao_cIdx] = ismember('cao_c',algSet.algNameSet);
+% [~,cao_uc_Idx] = ismember('cao_uc_',algSet.algNameSet);[~,cao_uc_sIdx] = ismember('cao_uc_s',algSet.algNameSet);
+% [~,cao_ucIdx] = ismember('cao_uc',algSet.algNameSet);
+% [~,cao_pc_Idx] = ismember('cao_pc_',algSet.algNameSet);[~,cao_pc_sIdx] = ismember('cao_pc_s',algSet.algNameSet);
+% [~,cao_pcIdx] = ismember('cao_pc',algSet.algNameSet);
 [~,caoIdx] = ismember('cao',algSet.algNameSet);
-[~,cao_c_Idx] = ismember('cao_c_',algSet.algNameSet);[~,cao_c_sIdx] = ismember('cao_c_s',algSet.algNameSet);
-[~,cao_cIdx] = ismember('cao_c',algSet.algNameSet);
-[~,cao_uc_Idx] = ismember('cao_uc_',algSet.algNameSet);[~,cao_uc_sIdx] = ismember('cao_uc_s',algSet.algNameSet);
-[~,cao_ucIdx] = ismember('cao_uc',algSet.algNameSet);
-[~,cao_pc_Idx] = ismember('cao_pc_',algSet.algNameSet);[~,cao_pc_sIdx] = ismember('cao_pc_s',algSet.algNameSet);
-[~,cao_pcIdx] = ismember('cao_pc',algSet.algNameSet);
+[~,rawCaoIdx] = ismember('cao_raw',algSet.algNameSet);
+[~,IMGMIdx] = ismember('IMGM',algSet.algNameSet);
+[~,IMGMNewIdx] = ismember('IMGM_new',algSet.algNameSet);
+
+algSet.algNameSetDisplay{caoIdx} = 'cao';
+algSet.algNameSetDisplay{rawCaoIdx} = 'raw_cao';
+algSet.algNameSetDisplay{IMGMIdx} = 'IMGM';
+algSet.algNameSetDisplay{IMGMNewIdx} = 'IMGM_new';
+
 algCnt = length(algSet.algEnable); 
 X=cell(algCnt,1);
 target.config.nodeCnt = length(target.config.selectNodeMask);
@@ -202,7 +211,7 @@ for testk = 1:testCnt
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % param for IMGM_new
             param.bVerbose = 0;
-            param.maxNumSearch = 20;
+            param.maxNumSearch = 25;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             param.subMethodParam.name = 'DPMC';
             param.subMethodParam.name = 'CAO';
@@ -287,7 +296,7 @@ for testk = 1:testCnt
             
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
             if test_multiple_increment
-                IMGMcount = 2;
+                IMGMcount = 15;
                 scrResult = zeros(4,IMGMcount);
                 accResult = zeros(4, IMGMcount);
                 conResult = zeros(4, IMGMcount);
@@ -398,12 +407,20 @@ for testk = 1:testCnt
 %                     a = 1;
                     
                     fprintf('The accuracy is %4.3f\n', accResult(:, i));
+                    fprintf('The time is %4.3f\n', timeResult(:, i));
                     fprintf('Start from %d graphs, %d graphs incremented\n', baseGraphCnt, i);
                 end
+%                 figure
+%                 plot(1:IMGMcount, accResult(1, :), '-o');
+
+                plotResult_new(0, 1:IMGMcount, timeResult', algSet, 'increment #', 'time');
+                plotResult_new(0, 1:IMGMcount, accResult', algSet, 'increment #', 'acc');
+                plotResult_new(0, 1:IMGMcount, scrResult', algSet, 'increment #', 'src');
+                plotResult_new(0, 1:IMGMcount, conResult', algSet, 'increment #', 'con');
+
             end
             %%%%%%%%%%%%%%%%%%%%% multiple incremental tests %%%%%%%%%%%%%%%%%%%%%
-
-
+            
             % now compute the performance
 %             a = 1;
             for algk = 1:algCnt
