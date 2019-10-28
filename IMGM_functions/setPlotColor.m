@@ -13,3 +13,7 @@ iccvClr = [.85 .55 0];
 % alg4Clr = [.8 0 .4];
 icmlClr = 'm';
 mpmClr = 'c';
+
+cao_rawClr = 'b';
+IMGMClr = 'y';
+IMGM_newClr = 'c';
