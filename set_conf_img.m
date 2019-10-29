@@ -8,9 +8,8 @@ conf.affinityDir=[conf.dataDir '/affinity'];
 conf.gtDir = [conf.dataDir 'ground_truth'];
 conf.resDir = './res';
 conf.tmpDir = './tmp';
-conf.numTrain =20;
-conf.numTest = 200;
-conf.numValid = 0;
+conf.numInlier = 10;
+conf.numOutlier = 0;
 conf.distRatioTrue = 0.15; % threshold ratio to decide the true match
                            % ratio of the object size 
 %conf.overwrite = false ;
