@@ -1,4 +1,4 @@
-function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
+function [X, numPairMatch] = IMGM_single_step(globalVar, affScore, rawMat, param)
     %%  single step of Incremental Multi Graph Matching
     % 1. in this algorithm, all graph must have equal # of keypoints
     % affScore is a param.N * param.N matrix
@@ -46,6 +46,9 @@ function [X] = IMGM_single_step(globalVar, affScore, rawMat, param)
         fprintf("bfs find %d graphs\n", nSearch);
     end
     
+    % number of matches
+    numPairMatch = sum((isCenter | isConsidered) & (~isInSubSet));
+
     included = find(isInSubSet);
     excluded = find(~isInSubSet);
     % pairwise match included
