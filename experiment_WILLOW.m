@@ -8,7 +8,7 @@ global affinity target
 setPlotColor;
 
 dataDir = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset';
-affinityDir=[dataDir '/affinity'];
+affinityDir = [dataDir '/affinity'];
 resDir = './res';
 
 testCnt = 5;
@@ -39,6 +39,9 @@ target.config.nodeCnt = nodeCnt;
 % load the data
 loadPath = fullfile(affinityDir, class, sprintf('in%02d_out%02d.mat', inCnt, outCnt));
 load(loadPath, 'rawMat', 'affinity');
+
+% save path for the result
+savePath = fullfile(resDir, class, sprintf('in%02d_out%02d.mat', inCnt, outCnt));
 
 % parameter for IMGM_old
 affinity.BiDir = 1;
@@ -207,4 +210,5 @@ for testk = 1:testCnt
 
 end
 
+save(savePath, 'accResult', 'timeResult', 'scrResult', 'conResult');
 
