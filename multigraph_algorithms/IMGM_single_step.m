@@ -47,7 +47,7 @@ function [X, numPairMatch] = IMGM_single_step(globalVar, affScore, rawMat, param
     end
     
     % number of matches
-    numPairMatch = sum((isCenter | isConsidered) & (~isInSubSet));
+    numPairMatch = sum(isCenter | isConsidered | isInSubSet);
 
     included = find(isInSubSet);
     excluded = find(~isInSubSet);
