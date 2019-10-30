@@ -1,9 +1,9 @@
 %% dataset papameters 
 conf.dataset = 'WILLOWOBJ';
-conf.dataDir = 'C:\Users\ChenZixuan\Documents\data\WILLOW-ObjectClass-dataset';
+conf.dataDir = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset';
 conf.imgDir=[conf.dataDir '/WILLOW-ObjectClass'];
 conf.annoDir=[conf.dataDir '/WILLOW-ObjectClass'];
-conf.featDir = [conf.dataDir '/feature'];
+conf.featDir = [conf.dataDir '/feature_0'];
 conf.affinityDir=[conf.dataDir '/affinity'];
 conf.gtDir = [conf.dataDir '/ground_truth'];
 conf.resDir = './res';
@@ -22,9 +22,9 @@ conf.referenceType = 'null';      % sample, source, null
 %classes = {classes(3:end).name} ;
 
 %conf.class = 'Face';
-conf.class = 'Duck';
-%conf.class = 'Car';
-%conf.class = 'Motorbike';
+% conf.class = 'Duck';
+% conf.class = 'Car';
+conf.class = 'Motorbike';
 %conf.class = 'Winebottle';
 
 conf.nExp = 1; % # of random trials for the class
