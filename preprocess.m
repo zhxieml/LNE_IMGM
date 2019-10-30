@@ -1,5 +1,5 @@
 function preprocess
-p = 'C:\Users\ChenZixuan\Documents\data\WILLOW-ObjectClass-dataset\feature';
+p = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset\feature';
 Class = ["Car", "Duck", "Face", "MotorBike", "Winebottle"];
 for cls = Class
     listOfFile = dir(fullfile(p, cls, "*.mat"));
