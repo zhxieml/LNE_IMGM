@@ -22,9 +22,9 @@ conf.referenceType = 'null';      % sample, source, null
 %classes = {classes(3:end).name} ;
 
 %conf.class = 'Face';
-conf.class = 'Duck';
-%conf.class = 'Car';
-%conf.class = 'Motorbike';
+% conf.class = 'Duck';
+% conf.class = 'Car';
+conf.class = 'Motorbike';
 %conf.class = 'Winebottle';
 
 conf.nExp = 1; % # of random trials for the class
