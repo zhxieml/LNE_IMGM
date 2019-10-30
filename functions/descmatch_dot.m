@@ -9,10 +9,10 @@ simdot = [];
 if bFullMatch
     np1 = size(desc1, 2);
     np2 = size(desc2, 2);
-    simdot = desc2' * desc1; % np2, np1
+    simdot = desc1' * desc2; % np2, np1
     simdot = reshape(simdot, 1, np1*np2);
     [X, Y] = meshgrid(1:np1, 1:np2);
-    initialMatch = [X(:), Y(:)]';
+    initialMatch = [Y(:), X(:)]';
 else
     nMax = min(kNN, size(desc2,2));
     % For each descriptor in the first image, select its match to second image.
