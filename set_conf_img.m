@@ -1,13 +1,15 @@
 %% dataset papameters 
 conf.dataset = 'WILLOWOBJ';
-conf.dataDir = 'C:/Users/xzh87/OneDrive/Reference/Lab/code/WILLOW-ObjectClass_dataset';
+conf.dataDir = 'C:\Users\ChenZixuan\Documents\data\WILLOW-ObjectClass-dataset';
 conf.imgDir=[conf.dataDir '/WILLOW-ObjectClass'];
 conf.annoDir=[conf.dataDir '/WILLOW-ObjectClass'];
+conf.featDir = [conf.dataDir '/feature'];
+conf.affinityDir=[conf.dataDir '/affinity'];
+conf.gtDir = [conf.dataDir '/ground_truth'];
 conf.resDir = './res';
 conf.tmpDir = './tmp';
-conf.numTrain =20;
-conf.numTest = 200;
-conf.numValid = 0;
+conf.numInlier = 10;
+conf.numOutlier = 0;
 conf.distRatioTrue = 0.15; % threshold ratio to decide the true match
                            % ratio of the object size 
 %conf.overwrite = false ;
