@@ -37,7 +37,7 @@ for gc=1:graphCnt
     affinity.nP{gc} = nodeCnt;
     % MPM (Cho et al. CVPR2014) method is more suitable in the random point set matching case i.e. bCreateRandom=0
     % Hence to fully release the capability of MPM, here we also involve bCreateRandom=0
-    if bGraphMatch% randomly and directly generate the edge weight of each graph, without setting coordinates of the points
+    if bGraphMatch % randomly and directly generate the edge weight of each graph, without setting coordinates of the points
         randomEdge = tril(rand(nodeCnt),-1);
         % generate the Gaussian noise
         N = deform*tril(randn(nodeCnt),-1);N=N+N';

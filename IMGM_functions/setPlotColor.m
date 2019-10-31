@@ -1,4 +1,4 @@
-caoClr = 'r';
+
 % alg1cClr = [1, 0.6732, 0];
 cao_cClr = 'b';
 rrwmClr = [.5 .5 .5];
@@ -14,6 +14,8 @@ iccvClr = [.85 .55 0];
 icmlClr = 'm';
 mpmClr = 'c';
 
-cao_rawClr = 'b';
-IMGMClr = 'y';
-IMGM_newClr = 'c';
+caoClr = 'r';
+caorawClr = 'b';
+imgmdClr = 'y';
+tbimgmcaoClr = 'c';
+tbimgmqmClr = [.85 .55 0];
