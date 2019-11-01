@@ -55,7 +55,7 @@ for gc=1:graphCnt
         PN = deform*randn(1,nodeCnt);
         affinity.pointFeat{gc} = randomPoint;
         affinity.pointFeat{gc}(1:nInlier) = basePoint;
-        affinity.pointFeat{gc} = affinity.pointFeat{gc} + PN;% add some noises
+        affinity.pointFeat{gc} = affinity.pointFeat{gc};% add some noises
     else% point matching, first generate the coordinate of 2D points, then derive their distance as edge weiths 
         pointSet = [basePointSet + deform*randn(2,nInlier) randn(2,nOutlier)];
         pointSet = pointSet';
@@ -98,11 +98,11 @@ for xview = 1:graphCnt
             affinity.KP{xview,yview} = zeros(nodeCnt,nodeCnt);
         end
         if bEdgeEnable
-            affinity.KQ{xview,yview} = exp(-conDst(affinity.edgeFeat{xview}, affinity.edgeFeat{yview},0) / Sacle_2D);%µ«±ßºÍ±ßÖ®¼äÓÐaffinity Kq£¬ÓÃÖ¸ÊýÐÎÊ½±È½ÏÆ½»¬±ãÓÚÓÅ»¯,ÐÎ³ÉÖ¸Êý»¯ºóµÄ±ß±ß¾ØÕón1*n2
+            affinity.KQ{xview,yview} = exp(-conDst(affinity.edgeFeat{xview}, affinity.edgeFeat{yview},0) / Sacle_2D);%ï¿½ï¿½ï¿½ßºÍ±ï¿½Ö®ï¿½ï¿½ï¿½ï¿½affinity Kqï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ê½ï¿½È½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½,ï¿½Î³ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ß±ß¾ï¿½ï¿½ï¿½n1*n2
         else
             affinity.KQ{xview,yview} = zeros(nodeCnt^2,nodeCnt^2);
         end
-        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EGÊÇ±ßµÄ¶ËµãµÄË÷Òý£¬2*n1,2*n
+        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EGï¿½Ç±ßµÄ¶Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2*n1,2*n
         affinity.K{xview,yview} = full(affinity.K{xview,yview});
     end
 end

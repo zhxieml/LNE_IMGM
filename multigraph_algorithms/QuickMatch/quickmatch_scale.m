@@ -8,18 +8,10 @@ function Scale = quickmatch_scale(data, n)
 % """
     nPoint = size(data, 1);
     Scale = zeros(1, nPoint);
-    for ii = 1:n:nPoint
-        dsq_i = euclidean_dist_matrix(data(ii:ii+n), data(ii:ii+n));
-        for k = 1:n
-            min_d = 1e5;
-            for y = 1:n
-                if k == y
-                    continue;
-                end
-                min_d = min(min_d, dsq_i(k, y));
-            end
-            Scale(ii+k) = min_d;
-        end
+    for ii = 0:n:nPoint-1
+        dsq_i = euclidean_dist_matrix(data(ii+1:ii+n, :), data(ii+1:ii+n, :));
+        dsq_i = dsq_i + 1e5*eye(n);
+        k = 1:n;
+        Scale(ii+k) =  min(dsq_i, [], 1);
     end
-
 end

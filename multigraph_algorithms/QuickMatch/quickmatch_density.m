@@ -1,5 +1,6 @@
-function tree_density = quickmatch_density(data, scales, param) 
+function tree_density = quickmatch_density(bigDstMat, scales, param) 
     rho = 0.25;
+    npoint = size(bigDstMat, 1);
     kernel = [];
     kernel_support_radius = false;
     flag_low_memory = false;
@@ -26,8 +27,10 @@ function tree_density = quickmatch_density(data, scales, param)
 
     Sigma = rho * scales;
     if (~flag_low_memory) || flag_recursive
-        dsq = data;
-        dsq = dsq / Sigma;
+        dsq = bigDstMat;
+        for jj = 1:npoint
+            dsq(:, jj) = dsq(:, jj) / Sigma(jj);
+        end
         if isempty(kernel)
             p = dsq;
         else
@@ -39,14 +42,13 @@ function tree_density = quickmatch_density(data, scales, param)
                 p = kernel(-dsq);
             end
         end
-        tree_density = sum(p,1);
+        tree_density = sum(p,2);
     else
-        % here data is [p, n] raw data
-        npoint = size(data, 1);
+        % here bigDstMat is [p, n] raw bigDstMat
         tree_density = zeros(1, npoint);
         for ii = 1:chunk_size:npoint
             jj = min(ii+chunk_size, npoint);
-            dsq = euclidean_dist_matrix(data(:, ii:jj), data);
+            dsq = euclidean_dist_matrix(bigDstMat(:, ii:jj), bigDstMat);
             param.flag_recursive = true;
             tree_density(ii:jj) = quickmatch_density(dsq, scales, param);
         end

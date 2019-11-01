@@ -21,7 +21,7 @@ iterRange = 6;
 graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
-algSet.algEnable =  [ 1,        1,           1,       1,       1,           1,              0,              0,          0];
+algSet.algEnable =  [ 0,        0,           0,       0,       1,           1,              1,              1,          0];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};
@@ -376,7 +376,7 @@ for testk = 1:testCnt
             % param for tbimgm_qmIdx
             param.subMethodParam.name = 'quickmatch';
             param.subMethodParam.rho = 0.25;
-            param.subMethodParam.rho_edge = 0.5;
+            param.subMethodParam.rho_edge = 0.7;
             % param.subMethodParam.kernel = @exp;
             param.subMethodParam.flag_low_memory = false;
             param.subMethodParam.kernel_support_radius = false;

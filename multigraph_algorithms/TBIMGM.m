@@ -2,14 +2,9 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     %%  single step of Incremental Multi Graph Matching
     % 1. in this algorithm, all graph must have equal # of keypoints
     % affScore is a param.N * param.N matrix
-    % param.subMethodParam.name = 'DPMC'
-    % param.subMethodParam.useCstDecay = 1
-    % param.subMethodParam.cstDecay  = 0.7
-    % param.subMethodParam.useWeightedDecay  = 0
-    % param.subMethodParam.iterMax = 5
-    newGraph = param.N + 1;
-    MST = zeros(newGraph, 'logical');
-    assert(newGraph == size(affScore,1), 'error:param.N != size(affScore,1)\n');
+
+    graphCnt = param.N + param.graphStep;
+    MST = zeros(graphCnt, 'logical');
     % find MST
     
     MST(1:param.N, 1:param.N) = Prim(affScore(1:param.N, 1:param.N));
@@ -17,30 +12,30 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     % initialize hyper graph
     isCenter = sum(MST) > 1;
     %% match members of all center
-    centerScore = affScore(newGraph, :).*double(isCenter);
+    centerScore = affScore(graphCnt, :).*double(isCenter);
     [~, bestCenter] = max(centerScore);
     %% match members of all edge points of best center
     isConsidered = MST(bestCenter, :) & ~isCenter;
     isConsidered(bestCenter) = true;
-    nodeScore = affScore(newGraph, :).*double(isConsidered);
+    nodeScore = affScore(graphCnt, :).*double(isConsidered);
     [~, bestMatch] = max(nodeScore);
 
     %% connect new graph with best match
-    MST(bestMatch, newGraph) = 1;
-    MST(newGraph, bestMatch) = 1;
+    MST(bestMatch, graphCnt) = 1;
+    MST(graphCnt, bestMatch) = 1;
     X = rawMat;
-    if newGraph <= 2
+    if graphCnt <= 2
         return;
     end
     if param.bVerbose
         fprintf('got best match with %d\n', bestMatch);
-        fprintf('before improvment, match score = %.3f\n', affScore(newGraph, bestMatch));
+        fprintf('before improvment, match score = %.3f\n', affScore(graphCnt, bestMatch));
     end
     
     %% apply multigraph algorithms to solve matches in included
     nSubSet = param.maxNumSearch;
     % breadth first search to find nSubSet nearest graphs
-    isInSubSet = bfs(MST, newGraph, nSubSet);
+    isInSubSet = bfs(MST, graphCnt, nSubSet);
     if param.bVerbose
         nSearch = nnz(isInSubSet);
         fprintf("bfs find %d graphs\n", nSearch);
@@ -52,8 +47,8 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     included = find(isInSubSet);
     excluded = find(~isInSubSet);
     % pairwise match included
-    affScore(newGraph, ~isInSubSet) = 0;
-    affScore(~isInSubSet, newGraph) = 0;
+    affScore(graphCnt, ~isInSubSet) = 0;
+    affScore(~isInSubSet, graphCnt) = 0;
     % apply multigraph algorithms
     method = param.subMethodParam;
     subIndies = getSubIndices(included);
@@ -61,14 +56,14 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     case 'CAO'
         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
-        pointFeat = globalVar.pointFeat{included};
+        pointFeat = globalVar.pointFeat(included);
         X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
 
     %% make consistent
-    stk = zeros(1, newGraph);
+    stk = zeros(1, graphCnt);
     consistent = MST;
     for root = included
         stk(:) = 0;

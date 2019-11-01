@@ -10,7 +10,5 @@ function dsq = euclidean_dist_matrix(a, b)
 	a_square = sum(a.^2, 2);
 	b_square = sum(b.^2, 2);
 	dsq = a_square*ones(1, n2) + ones(n1, 1)*b_square' - 2*a*b';
-
 	dsq =  sqrt(dsq);
-    
 end

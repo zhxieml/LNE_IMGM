@@ -1,10 +1,10 @@
 function clusters = quickmatch_breaktree_merge(tree_parent, tree_distance, scales, rho_edge)
-    npoint = size(tree_parent,1);
+    npoint = size(tree_parent,2);
     clusters_indicator = 1:npoint;
-    clusters = num2cell(1:npoint);
+    clusters = num2cell(int32(1:npoint));
     match_dis = scales;
 
-    [~, idx_sorted] = sort(tree_distance, 1);
+    [~, idx_sorted] = sort(tree_distance, 2);
     for i = idx_sorted
         p = tree_parent(i);
         c1 = clusters_indicator(i);

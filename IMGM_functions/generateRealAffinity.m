@@ -1,9 +1,7 @@
 function [affinity, rawMat] = generateRealAffinity
     % generate affinity matrix
-    init_path;
-    set_conf_img;
-    set_param_GM;
-    cls = conf.class;
+    global target;
+    
     savePath = fullfile(conf.affinityDir, cls, sprintf('in%02d_out%02d.mat', conf.numInlier, conf.numOutlier));
     if isfile(savePath)
         load(savePath, 'affinity');
