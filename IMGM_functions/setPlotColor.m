@@ -15,7 +15,11 @@ icmlClr = 'm';
 mpmClr = 'c';
 
 caoClr = 'r';
-caorawClr = 'b';
-imgmdClr = 'y';
-tbimgmcaoClr = 'c';
-tbimgmqmClr = [.85 .55 0];
+cao_pc_rawClr = 'b';
+imgm_dClr = 'y';
+imgm_rClr = [.5,0.2,.8];
+tbimgm_caoClr = 'c';
+tbimgm_cao_pcClr = 'g';
+tbimgm_cao_ucClr = [.5, .5, .5];
+tbimgm_qmClr = [.85 .55 0];
+tbimgm_matchALSClr = 'm';

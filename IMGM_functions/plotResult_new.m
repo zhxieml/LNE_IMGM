@@ -1,4 +1,4 @@
-function newFig = plotResult_new(legendOff,cate_config,ave,algSet,xtag,ytag,displayOrder)
+function newFig = plotResult_new(legendOff, cate_config, ave, algSet, xtag, ytag, displayOrder)
 % (0, x, (xnum * algnum), (xnum * algnum), algSet, xtag, ytag)
 
 if nargin ==6
