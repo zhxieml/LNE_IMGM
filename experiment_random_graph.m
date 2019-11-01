@@ -396,6 +396,11 @@ for testk = 1:testCnt
         if algSet.algEnable(tbimgm_matchALS)
             % param for tbimgm_matchALS
             param.subMethodParam.name = 'quickmatch';
+            param.subMethodParam.rho = 0.25;
+            param.subMethodParam.rho_edge = 0.5;
+            % param.subMethodParam.kernel = @exp;
+            param.subMethodParam.flag_low_memory = false;
+            param.subMethodParam.kernel_support_radius = false;
             % previous matching: prevMatching{tbimgm_matchALS}
             if parak == 1
                 prevMatching{tbimgm_matchALS} = baseMat;

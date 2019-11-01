@@ -56,14 +56,13 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     affScore(~isInSubSet, newGraph) = 0;
     % apply multigraph algorithms
     method = param.subMethodParam;
+    subIndies = getSubIndices(included);
     switch method.name
     case 'CAO'
-        subIndies = getSubIndices(included);
         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
-        
-    case 'matchALS'
-
+        pointFeat = globalVar.pointFeat{included};
+        X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end

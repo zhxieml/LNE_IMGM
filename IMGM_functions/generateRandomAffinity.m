@@ -59,9 +59,9 @@ for gc=1:graphCnt
     else% point matching, first generate the coordinate of 2D points, then derive their distance as edge weiths 
         pointSet = [basePointSet + deform*randn(2,nInlier) randn(2,nOutlier)];
         pointSet = pointSet';
-       % 2nd Order Matrix
-       [X,Y] = meshgrid(1:nodeCnt,1:nodeCnt);
-       LL = [X(:),Y(:)];   
+        % 2nd Order Matrix
+        [X,Y] = meshgrid(1:nodeCnt,1:nodeCnt);
+        LL = [X(:),Y(:)];   
         G = pointSet(LL(:,1),:)-pointSet(LL(:,2),:);
         G = sqrt(G(:,1).^2+G(:,2).^2);
         G = reshape(G, [nodeCnt nodeCnt]);
