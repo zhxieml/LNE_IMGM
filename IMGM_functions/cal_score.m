@@ -1,4 +1,4 @@
-function [score rawScore gtScore]= cal_score(P, K, GT)
+function [score, rawScore, gtScore]= cal_score(P, K, GT)
 % P: (Nx*Ny) * 1
 % GT: (Nx*Ny) * 1
 if nargin<3

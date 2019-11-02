@@ -1,5 +1,5 @@
-function subIndices = getSubIndices(subset)
+function subIndices = getSubIndices(subset, nodeCnt)
     subLength = length(subset);
-    subIndices = 10 * ones(10, subLength) * diag(subset - ones(1, subLength)) + repmat((1:10)', 1, subLength);
+    subIndices = nodeCnt * ones(nodeCnt, subLength) * diag(subset - ones(1, subLength)) + repmat((1:nodeCnt)', 1, subLength);
     subIndices = subIndices(:);
 end
