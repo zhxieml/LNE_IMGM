@@ -5,7 +5,6 @@ global target
 affinity.BiDir = target.config.affinityBiDir;
 affinity.edgeAffinityWeight = target.config.edgeAffinityWeight;
 affinity.angleAffinityWeight = target.config.angleAffinityWeight;
-
 bGraphMatch = target.config.bGraphMatch;
 bUnaryEnable = target.config.bUnaryEnable;
 bEdgeEnable = target.config.bEdgeEnable;

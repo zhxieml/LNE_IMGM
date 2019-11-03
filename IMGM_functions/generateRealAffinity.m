@@ -1,16 +1,30 @@
-function [affinity, rawMat] = generateRealAffinity
+function [affinity] = generateRealAffinity(testk)
     % generate affinity matrix
     global target;
     set_param_GM;
+    affinity.BiDir = target.config.affinityBiDir;
+    affinity.edgeAffinityWeight = target.config.edgeAffinityWeight;
+    affinity.angleAffinityWeight = target.config.angleAffinityWeight;
     affinityDir = target.config.affinityDir;
     nInlier = target.config.nInlier;
     nOutlier = target.config.nOutlier;
     featDir = target.config.featDir;
     gtDir = target.config.gtDir;
     cls = target.config.class;
+    complete = target.config.complete;
     nodeCnt = nOutlier + nInlier;
     graphCnt = target.config.graphCnt;
-    affinityRatio = target.config.affinityRatio;
+    weight = target.config.weight;
+    Sacle_2D = target.config.Sacle_2D;
+    affinity.graphCnt = graphCnt;
+    affinity.nodeCnt = nodeCnt;
+    affinity.EG = cell(graphCnt,1);
+    M = getTrans(nodeCnt);
+    if complete<1
+        target.pairwiseMask{testk} = generateRandomCompleteMask(nodeCnt,graphCnt,target.config.complete);
+    else % fully complete, hence all are ones
+        target.pairwiseMask{testk} = ones(graphCnt*nodeCnt,graphCnt*nodeCnt);
+    end
     
     savePath = fullfile(affinityDir, cls, sprintf('in%02d_out%02d.mat', nInlier, nOutlier));
     if isfile(savePath)
@@ -18,44 +32,76 @@ function [affinity, rawMat] = generateRealAffinity
     else
         listOfFeatFile = dir(fullfile(featDir, cls, '*.mat'));
         for gc = 1:graphCnt
-            feat = load(fullfile(listOfFeatFile(gc).folder, listOfFeatFile(gc).name);
+            affinity.nP{gc} = nodeCnt;
+            feat = load(fullfile(listOfFeatFile(gc).folder, listOfFeatFile(gc).name));
             pointSet = feat.frames(1:2, :);
+            pointSet = pointSet';
             [X, Y] = meshgrid(1:nodeCnt, 1:nodeCnt);
             LL = [X(:), Y(:)];
-            edges = pointSet(LL(:,1),:)-pointSet(LL(:,2),:); %edge# \times 2
-            edgeLen = sqrt(edges(:, 1).^2 + edges(:, 2).^2); %edge# \times 1
+            G = pointSet(LL(:,1),:)-pointSet(LL(:,2),:); %edge# \times 2
+            edgeLen = sqrt(G(:, 1).^2 + G(:, 2).^2); %edge# \times 1
             mask = (edgeLen ~= 0);
             edgeAngle = zeros(size(edgeLen));
-            edgeAngle(mask) = acos(edges(mask,1)./edgeLen(mask));
-
-            affinity.edgeLen{gc} = edgeLen'/max(edgeLen);
-            affinity.edgeAngle{gc} = edgeAngle';
-            affinity.pointFeat{gc} = feat.desc;
-        end
-        for xview = 1:graphCnt
-            if affinity.BiDir
-                yviewSet = [1:xview-1, xview+1:graphCnt];
-            else
-                yviewSet = xview+1:graphCnt;
+            edgeAngle(mask) = acos(G(mask,1)./edgeLen(mask));
+            edgeAngle = reshape(edgeAngle, nodeCnt, nodeCnt);
+            edgeLen = edgeLen ./ max(edgeLen);
+            edgeLen = reshape(edgeLen, [nodeCnt nodeCnt]);
+            affinity.edge{gc} = edgeLen';
+            affinity.edgeAngle{gc} = edgeAngle'; % nodeCnt \time nodeCnt
+            affinity.pointFeat{gc} = feat.descriptors;
+            affinity.nE{gc} = sum(sum(~isnan(edgeLen)));
+            [r,c]=find(~isnan(edgeLen));
+            affinity.EG{gc}=[r,c]';% size is 2 \times Data.nE{1} (i.e. number of edges), the fist row is one ending point, the second row is the other
+            % incidence matrix
+            affinity.G{gc} = zeros(nodeCnt,affinity.nE{gc});
+            for c = 1 : affinity.nE{gc}
+                affinity.G{gc}(affinity.EG{gc}(:, c), c) = 1;
             end
-            for yview = yviewSet
-                if bUnaryEnable
-                    affinity.KP{xview,yview} = exp(-conDst(affinity.pointFeat{xview}, affinity.pointFeat{yview},0) / Sacle_2D);
+            % augumented adjacency
+            affinity.H{gc} = [affinity.G{gc}, eye(nodeCnt)];
+        end
+        affinity.GT = zeros(graphCnt*nodeCnt);
+        mask = eye(nodeCnt^2, 'logical');
+        for x = 1:graphCnt          
+            nameXgt = listOfFeatFile(x).name;
+            xview = (x-1)*nodeCnt+1:(x-1)*nodeCnt+nInlier;
+            for y = x+1:graphCnt
+                nameYgt = listOfFeatFile(y).name;
+                yview = (y-1)*nodeCnt+1:(y-1)*nodeCnt+nInlier;
+                if target.config.bUnaryEnable
+                    KU = exp(-conDst(affinity.pointFeat{x}, affinity.pointFeat{y},0) / Sacle_2D);
+                    KU = KU';
+                    KU = diag(KU(:));
                 else
-                    affinity.KP{xview,yview} = zeros(nodeCnt,nodeCnt);
+                    KU = zeros(nodeCnt^2);
                 end
-                if bEdgeEnable
-                    KQ = exp(-conDst(affinity.edgeLen{xview}, affinity.edgeLen{yview},0) / Sacle_2D);
+                if target.config.bEdgeEnable
+                    A = kron(affinity.edge{x}, ones(nodeCnt));
+                    B = kron(ones(nodeCnt), affinity.edge{y});
+                    KE = exp(-((A-B).^2)/Sacle_2D);
+                    KE(mask) = 0;
                 else
-                    KQ = zeros(nodeCnt^2,nodeCnt^2);
+                    KE = zeros(nodeCnt^2);
                 end
-                if bAngleEnable
-                    
+                if target.config.bAngleEnable
+                    A = kron(affinity.edgeAngle{x}, ones(nodeCnt));
+                    B = kron(ones(nodeCnt), affinity.edgeAngle{y});
+                    KA = abs(A - B);
+                else
+                    KA = zeros(nodeCnt^2);
                 end
-                KP = affinity.KP{xview, yview}(LL(:,1))
-                affinity.K{xview, yview} = affinityRatio* KQ + (1-affinityRatio)*Kangle;
+                affinity.K{x, y} = weight(1)*KU + weight(2)* KE + weight(3)*KA;
+                affinity.K{y, x} = M*(affinity.K{x, y}*M);
+                gtPath = fullfile(gtDir, cls, sprintf("%s_%s_%s.mat", cls, nameXgt(end-7:end-4), nameYgt(end-7:end-4)));
+                gt = load(gtPath);
+                affinity.GT(xview, yview) = gt.groundTruth.assign;
             end
         end
+        affinity.GT = affinity.GT + affinity.GT' + eye(nodeCnt*graphCnt);
+        if ~isfolder(fullfile(affinityDir, cls))
+            mkdir(fullfile(affinityDir, cls));
+        end
+        save(savePath, 'affinity');
     end
     
 end

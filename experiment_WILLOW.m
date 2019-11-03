@@ -4,7 +4,17 @@ global affinity target
 init_path;
 
 setPlotColor;
-setObsoleteVariables;% some old parameters are used for debug and other tests, less relevant to the algorithm
+algpar = setPairwiseSolver();
+
+target.config.bUnaryEnable = 0;%bUnaryEnable=1 use point-wise unary similarity, otherwise not
+target.config.bEdgeEnable = 1;%bEdgeEnable=1 use edge-wise 2nd-order similarity, otherwise not
+target.config.bAngleEnable = 1;
+target.config.weight = [0, 1, 0]; % weight for Unary, Edge and Angle
+target.config.bSaveRandom = 0;% not to save the random graphs. it is used when reproducing the exact same results
+target.config.bCreateRandom = 1;% if set to 0, will read the random graphs from files
+target.config.affinityBiDir = 1;% used for mOpt
+target.config.bPermute = 1;% set the ground truth by identity matrix, other choices are not used in demo
+% some old parameters are used for debug and other tests, less relevant to the algorithm
 % by default set to 0 for target.config.useCstInlier (affinity-driven), no use in formal test type, only useful in massiveOutlier mode 
 % target.config.useCstInlier = 0;% set to 1 if use consistency to mask inliers, otherwise use affinity metrics, see Sec 3.5 in PAMI paper
 % random graph test, note not the random point set test as used in mpm
@@ -12,7 +22,7 @@ setObsoleteVariables;% some old parameters are used for debug and other tests, l
 % target.config.testType = 'formal';% for logic simplicity, this demo code involves only formal case for random graphs Fig.3, another is massOutlier.
 
 
-varyMinGrhCnt=30; varyMaxGrhCnt=50; grhTestCnt = 20;% 
+varyMinGrhCnt=30; varyMaxGrhCnt=50 ; grhTestCnt = 1;% 
 target.config.Sacle_2D = 0.05;
 target.config.database = 'WILLOW-Object-Class';% only synthetic test is allowed here
 
@@ -37,11 +47,13 @@ switch target.config.category
         target.config.nOutlier = 0;
         target.config.featDir = [target.config.dataDir '\feature_0'];
         target.config.affinityDir=[target.config.dataDir '\affinity_0'];
+        target.config.complete = 1;
     case 'outlier'
         target.config.nInlier = 10;
         target.config.nOutlier = 4;
         target.config.featDir = [target.config.dataDir '\feature_4'];
         target.config.affinityDir=[target.config.dataDir '\affinity_4'];
+        target.config.complete = 1;
 end
 iterRange = 6;
 graphMinCnt = varyMinGrhCnt;
@@ -91,6 +103,16 @@ target.config.graphCnt = graphRange(end) + graphStep;
 nodeCnt = target.config.nodeCnt;
 graphCnt = target.config.graphCnt;
 
+target.config.initConstWeight = .2; % initial weight for consitency regularizer, suggest 0.2-0.25
+target.config.constStep = 1.1;% inflate parameter, suggest 1.1-1.2
+target.config.constWeightMax = 1;
+target.config.constIterImmune = 2; % in early iterations, not involve consistency, suggest 1-3
+target.config.edgeAffinityWeight = 1;% in random graphs, only edge affinity is used, angle is meaningless
+target.config.angleAffinityWeight = 1 - target.config.edgeAffinityWeight;
+target.config.selectNodeMask = 1:1:nInlier+target.config.nOutlier;
+target.config.selectGraphMask{1} = 1:graphMaxCnt;
+
+
 % paraCnt: iterate over graph #
 % algCnt: iterate over algorithms
 % testCnt: iterate over tests
@@ -125,7 +147,8 @@ fprintf('\n');fprintf(fidPerf,'\n');
 for testk = 1:testCnt
     fprintf('Run test in round %d\n', testk);
 
-    [affinity, rawMat] = generateRealAffinity;
+    affinity = generateRealAffinity(testk);
+    rawMat = generatePairAssignment(algpar,nodeCnt,graphCnt,testk);
     sigma = 0;
     % rrwm pairwise match, once for all graph pairs
     target.config.inCnt = nodeCnt - target.config.nOutlier;
