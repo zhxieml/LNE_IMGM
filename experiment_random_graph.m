@@ -21,7 +21,7 @@ iterRange = 6;
 graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
-algSet.algEnable =  [ 0,        0,           0,       0,       1,           1,              1,              1,          0];
+algSet.algEnable =  [ 0,        0,           0,       0,       1,           1,              1,              1,          1];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};
@@ -399,7 +399,7 @@ for testk = 1:testCnt
             acc{tbimgm_qmIdx} = cal_pair_graph_accuracy(increMatching{tbimgm_qmIdx},affinity.GT,target.config.nOutlier,nodeCnt,param.N+graphStep);
             scr{tbimgm_qmIdx} = cal_pair_graph_score(increMatching{tbimgm_qmIdx},affinity.GT,nodeCnt,param.N+graphStep);
             con{tbimgm_qmIdx} = cal_pair_graph_consistency(increMatching{tbimgm_qmIdx},nodeCnt,param.N+graphStep,0);
-            
+           
             accAve(parak, tbimgm_qmIdx, testk) = mean(acc{tbimgm_qmIdx}(:));
             scrAve(parak, tbimgm_qmIdx, testk) = mean(scr{tbimgm_qmIdx}(:));
             conPairAve(parak, tbimgm_qmIdx, testk) = mean(con{tbimgm_qmIdx}(:));
@@ -415,8 +415,10 @@ for testk = 1:testCnt
             if parak == 1
                 prevMatching{tbimgm_matchALSIdx} = baseMat;
             end
+                        
             matTmp{tbimgm_matchALSIdx} = rawMat(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep));
             matTmp{tbimgm_matchALSIdx}(1:nodeCnt*param.N,1:nodeCnt*param.N)=prevMatching{tbimgm_matchALSIdx};
+                        
             scrDenomMatInCntTmp = cal_pair_graph_inlier_score(matTmp{tbimgm_matchALSIdx},affinity.GT(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep)),nodeCnt,param.N+graphStep,nodeCnt);
             conDenomMatInCntTmp = cal_pair_graph_consistency(matTmp{tbimgm_matchALSIdx},nodeCnt,param.N+graphStep,0);
             
@@ -426,6 +428,11 @@ for testk = 1:testCnt
             [increMatching{tbimgm_matchALSIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_matchALSIdx}, param);
             tEnd = toc(tStart);
             prevMatching{tbimgm_matchALSIdx} = increMatching{tbimgm_matchALSIdx};
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            check_assign_matrix(increMatching{tbimgm_matchALSIdx}, nodeCnt);
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
             
             acc{tbimgm_matchALSIdx} = cal_pair_graph_accuracy(increMatching{tbimgm_matchALSIdx},affinity.GT,target.config.nOutlier,nodeCnt,param.N+graphStep);
             scr{tbimgm_matchALSIdx} = cal_pair_graph_score(increMatching{tbimgm_matchALSIdx},affinity.GT,nodeCnt,param.N+graphStep);

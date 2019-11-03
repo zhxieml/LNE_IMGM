@@ -58,6 +58,10 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     case 'quickmatch'
         pointFeat = globalVar.pointFeat(included);
         X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
+    case 'matchALS'
+        nFeature = ones(length(included), 1) * nodeCnt;
+        M_out = mmatch_CVX_ALS(rawMat(subIndies, subIndies), nFeature, 'verbose', false, 'univsize', length(subIndies));
+        X(subIndies, subIndies) = full(M_out);
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end

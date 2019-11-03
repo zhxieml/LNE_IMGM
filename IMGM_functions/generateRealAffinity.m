@@ -2,7 +2,12 @@ function [affinity, rawMat] = generateRealAffinity
     % generate affinity matrix
     global target;
     
-    savePath = fullfile(conf.affinityDir, cls, sprintf('in%02d_out%02d.mat', conf.numInlier, conf.numOutlier));
+    init_path;
+    set_conf_img;
+    set_param_GM;
+    cls = conf.class;
+    
+    savePath = fullfile(conf.affinityDir, conf.class, sprintf('in%02d_out%02d.mat', conf.numInlier, conf.numOutlier));
     if isfile(savePath)
         load(savePath, 'affinity');
         load(savePath, 'rawMat');
@@ -19,7 +24,7 @@ function [affinity, rawMat] = generateRealAffinity
     for idxGraph1 = 1:graphCnt
         viewInfo1 = load(fullfile(listOfFeatFile(idxGraph1).folder, listOfFeatFile(idxGraph1).name), 'view');
         rawMat{idxGraph1, idxGraph1} = eye(nodeCnt);
-        affinity.GT{idxGraph1, idxGraph1} = eye(conf.numInlier);
+        affinity.GT{idxGraph1, idxGraph1} = eye(nodeCnt);
         for idxGraph2 = idxGraph1+1:graphCnt
             fprintf("matching %s to %s...\n", listOfFeatFile(idxGraph1).name, listOfFeatFile(idxGraph2).name);
             viewInfo2 = load(fullfile(listOfFeatFile(idxGraph2).folder, listOfFeatFile(idxGraph2).name), 'view');
@@ -40,6 +45,11 @@ function [affinity, rawMat] = generateRealAffinity
             end
                 
             Xgt = groundTruth.assign;
+            
+            if conf.numInlier > 0
+                Xgt(conf.numInlier+1:nodeCnt, conf.numInlier+1:nodeCnt) = 0;
+            end
+            
             affinity.GT{idxGraph1, idxGraph2} = Xgt;
             affinity.GT{idxGraph2, idxGraph1} = Xgt';
             X = reshape(res.X, nodeCnt, nodeCnt);

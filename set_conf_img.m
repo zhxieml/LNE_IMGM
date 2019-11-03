@@ -3,13 +3,13 @@ conf.dataset = 'WILLOWOBJ';
 conf.dataDir = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset';
 conf.imgDir=[conf.dataDir '/WILLOW-ObjectClass'];
 conf.annoDir=[conf.dataDir '/WILLOW-ObjectClass'];
-conf.featDir = [conf.dataDir '/feature_0'];
+conf.featDir = [conf.dataDir '/feature_4'];
 conf.affinityDir=[conf.dataDir '/affinity'];
 conf.gtDir = [conf.dataDir '/ground_truth'];
 conf.resDir = './res';
 conf.tmpDir = './tmp';
 conf.numInlier = 10;
-conf.numOutlier = 0;
+conf.numOutlier = 4;
 conf.distRatioTrue = 0.15; % threshold ratio to decide the true match
                            % ratio of the object size 
 %conf.overwrite = false ;
@@ -25,7 +25,7 @@ conf.referenceType = 'null';      % sample, source, null
 % conf.class = 'Duck';
 % conf.class = 'Car';
 conf.class = 'Motorbike';
-%conf.class = 'Winebottle';
+% conf.class = 'Winebottle';
 
 conf.nExp = 1; % # of random trials for the class
 
