@@ -75,7 +75,7 @@ XX1 = sum(X1 .* X1); XX2 = sum(X2 .* X2);
 % end
 X12 = X1' * X2;
 D = repmat(XX1', [1, n2]) + repmat(XX2, [n1, 1]) - 2 * X12;
-if bAngle%角度的话需要做2-x的rounding 因为角度已经被归一化到[-1,1]
+if bAngle %角度的话需要做2-x的rounding 因为角度已经被归一化到[-1,1]
     idx = find (D>1);
     D(idx) = (sqrt(D(idx))-2).^2;
 end
