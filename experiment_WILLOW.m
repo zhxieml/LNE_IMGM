@@ -98,6 +98,7 @@ graphRange = baseGraphCnt:graphStep:graphMaxCnt-graphStep;
 paraCnt = length(graphRange);
 nInlier = target.config.nInlier;
 nOutlier = target.config.nOutlier;
+target.config.totalCnt = graphMaxCnt;
 target.config.nodeCnt = nInlier + nOutlier;
 target.config.graphCnt = graphRange(end) + graphStep;
 nodeCnt = target.config.nodeCnt;
@@ -107,11 +108,11 @@ target.config.initConstWeight = .2; % initial weight for consitency regularizer,
 target.config.constStep = 1.1;% inflate parameter, suggest 1.1-1.2
 target.config.constWeightMax = 1;
 target.config.constIterImmune = 2; % in early iterations, not involve consistency, suggest 1-3
-target.config.edgeAffinityWeight = 1;% in random graphs, only edge affinity is used, angle is meaningless
+target.config.edgeAffinityWeight = 0.9;% in random graphs, only edge affinity is used, angle is meaningless
 target.config.angleAffinityWeight = 1 - target.config.edgeAffinityWeight;
 target.config.selectNodeMask = 1:1:nInlier+target.config.nOutlier;
 target.config.selectGraphMask{1} = 1:graphMaxCnt;
-
+target.config.connect = 'fc';
 
 % paraCnt: iterate over graph #
 % algCnt: iterate over algorithms
