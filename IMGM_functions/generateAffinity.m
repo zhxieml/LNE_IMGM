@@ -12,6 +12,7 @@ Sacle_2D = target.config.Sacle_2D;
 nodeCnt = target.config.nodeCnt;
 graphCnt = target.config.graphCnt;
 totalCnt = target.config.totalCnt;
+nInlier = target.config.nInlier;
 affinity.graphCnt = graphCnt;
 affinity.nodeCnt = nodeCnt;
 affinity.clusterGT = zeros(graphCnt,1);
@@ -25,7 +26,7 @@ end
 adjlen = zeros(graphCnt,1);
 Data = cell(graphCnt,1);
 permutation = randperm(totalCnt);
-% permutation = 1:totalCnt;
+%permutation = 1:totalCnt;
 for viewk = 1:graphCnt
     vk = permutation(viewk);
     Data{viewk}.nP = size(target.data{vk}.point,1);%点的数目
@@ -41,7 +42,11 @@ for viewk = 1:graphCnt
         for c = r+1:nodeCnt
             Data{viewk}.edge(r,c) = sqrt((target.data{vk}.point(r,1)-target.data{vk}.point(c,1))^2+(target.data{vk}.point(r,2)-target.data{vk}.point(c,2))^2);
             % atan(X) is in the range [-pi/2,pi/2]. 现在再转成[-90,90]
-            Data{viewk}.angle(r,c) = 180/pi*atan((target.data{vk}.point(r,2)-target.data{vk}.point(c,2))/(target.data{vk}.point(r,1)-target.data{vk}.point(c,1)));
+            if target.data{vk}.point(r, :) == target.data{vk}.point(c, :)
+                Data{viewk}.angle(r,c) = 0;
+            else
+                Data{viewk}.angle(r,c) = 180/pi*atan((target.data{vk}.point(r,2)-target.data{vk}.point(c,2))/(target.data{vk}.point(r,1)-target.data{vk}.point(c,1)));
+            end
         end
     end
     Data{viewk}.edge = Data{viewk}.edge/max(Data{viewk}.edge(:));
@@ -129,12 +134,13 @@ for viewk=1:graphCnt
     Data{viewk}.edge(~Data{viewk}.adjMatrix) = NaN;
     Data{viewk}.angle(~Data{viewk}.adjMatrix) = NaN;
     Data{viewk}.nE = sum(sum(Data{viewk}.adjMatrix));
-    affinity.clusterGT(viewk) = target.clusterGT(vk);
+    %affinity.clusterGT(viewk) = target.clusterGT(vk);
             
     [r,c]=find(~isnan(Data{viewk}.edge));
     affinity.EG{viewk}=[r,c]';%2*Data.nE{1} 即2*边的数目 第一行是起点 第二行是终点
     Data{viewk}.edgeFeat = Data{viewk}.edge(~isnan(Data{viewk}.edge))';%edgeFeat是一个1*边数的矩阵,edge是triangle的mask
     Data{viewk}.angleFeat = Data{viewk}.angle(~isnan(Data{viewk}.angle))';
+    %fprintf("length of edgeFeat=%d, length of angleFeat = %d\n", length(Data{viewk}.edgeFeat), length(Data{viewk}.angleFeat));
     if bUnaryEnable
         Data{viewk}.pointFeat = target.data{vk}.feat';%一列是一个点的feature @todo
     end
@@ -153,7 +159,9 @@ for viewk=1:graphCnt
     
 end
 %下面计算affinity矩阵
+affinity.GT = eye(nodeCnt*graphCnt);
 for xview = 1:graphCnt
+    xview_gt =(xview-1)*nodeCnt+1:(xview-1)*nodeCnt+nInlier;
 %     for yview = xview+1:graphCnt
     if affinity.BiDir
         yviewSet = [1:xview-1,xview+1:graphCnt];
@@ -161,6 +169,9 @@ for xview = 1:graphCnt
         yviewSet = xview+1:graphCnt;
     end
     for yview = yviewSet
+        % load ground truth data
+        yview_gt = (yview-1)*nodeCnt+1:(yview-1)*nodeCnt+nInlier;
+        affinity.GT(xview_gt, yview_gt) = target.GT{permutation(xview), permutation(yview)};
         % % % 考虑一阶特征相似度     
         if bUnaryEnable%@todo
             featAffinity = conDst(Data{xview}.pointFeat, Data{yview}.pointFeat,0)/10000/128;
@@ -175,6 +186,7 @@ for xview = 1:graphCnt
                 dq = dq + affinity.edgeAffinityWeight*conDst(Data{xview}.edgeFeat, Data{yview}.edgeFeat,0);%计算两个图里边边之间的距离平方，形成边的距离矩阵n1*n2
             end
             if isfield(Data{xview},'angleFeat') && affinity.angleAffinityWeight>0
+                %debug_tmp = conDst(Data{xview}.angleFeat, Data{yview}.angleFeat,1);
                 dq = dq + affinity.angleAffinityWeight*conDst(Data{xview}.angleFeat, Data{yview}.angleFeat,1);
             end
     %         affinity.DQ{xview,yview} = dq;
