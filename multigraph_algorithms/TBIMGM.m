@@ -85,7 +85,9 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
                 T = (t-1)*nodeCnt;
                 F = (f-1)*nodeCnt;
                 Xrf = X(R+1:R+nodeCnt, T+1:T+nodeCnt)*X(T+1:T+nodeCnt, F+1:F+nodeCnt);
-                Srf = Xrf(:)'*(globalVar.K{root, f}*Xrf(:));
+                vecXrf = Xrf';
+                vecXrf = vecXrf(:);
+                Srf = vecXrf'*(globalVar.K{root, f}*vecXrf);
                 if Srf > affScore(root, f) 
                     X(R+1:R+nodeCnt, F+1:F+nodeCnt) = Xrf;
                     X(F+1:F+nodeCnt, R+1:R+nodeCnt) = Xrf';
@@ -113,7 +115,9 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
         Xac = X(base_a+1:base_a+nodeCnt, base_c+1:base_c+nodeCnt);
         Xcb = X(base_c+1:base_c+nodeCnt, base_b+1:base_b+nodeCnt);
         Xab = Xac*Xcb;
-        Sab = Xab(:)'*(globalVar.K{a, b}*Xab(:));
+        vecXab = Xab';
+        vecXab = vecXab(:);
+        Sab = vecXrf'*(globalVar.K{a, b}*vecXab);
         if Sab > affScore(a, b)
             X(base_a+1:base_a+nodeCnt, base_b+1:base_b+nodeCnt) = Xab;
             X(base_b+1:base_b+nodeCnt, base_a+1:base_a+nodeCnt) = Xab';

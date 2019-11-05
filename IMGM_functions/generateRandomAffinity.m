@@ -54,7 +54,7 @@ for gc=1:graphCnt
         PN = deform*randn(1,nodeCnt);
         affinity.pointFeat{gc} = randomPoint;
         affinity.pointFeat{gc}(1:nInlier) = basePoint;
-        affinity.pointFeat{gc} = affinity.pointFeat{gc};% add some noises
+        affinity.pointFeat{gc} = affinity.pointFeat{gc} + PN;% add some noises
     else% point matching, first generate the coordinate of 2D points, then derive their distance as edge weiths 
         pointSet = [basePointSet + deform*randn(2,nInlier) randn(2,nOutlier)];
         pointSet = pointSet';
@@ -101,7 +101,7 @@ for xview = 1:graphCnt
         else
             affinity.KQ{xview,yview} = zeros(nodeCnt^2,nodeCnt^2);
         end
-        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EG�ǱߵĶ˵��������?2*n1,2*n
+        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EG�ǱߵĶ˵��������?2*n1,2*n
         affinity.K{xview,yview} = full(affinity.K{xview,yview});
     end
 end
