@@ -14,14 +14,14 @@ target.config.testType = 'formal';% massOutlier
 algpar = setPairwiseSolver();
 mpmAlgPar = setMPMAlgPar;
 
-varyMinGrhCnt=20; varyMaxGrhCnt=50; grhTestCnt = 10;% 
+varyMinGrhCnt=20; varyMaxGrhCnt=50; grhTestCnt = 1;% 
 target.config.database = 'synthetic';% only synthetic test is allowed here
 target.config.Sacle_2D = 0.05;
 iterRange = 6;
 graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
-algSet.algEnable =  [ 0,        0,           0,       0,       1,           1,              1,              1,          1];
+algSet.algEnable =  [ 0,        0,           1,       1,       1,           1,              1,              1,          1];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};

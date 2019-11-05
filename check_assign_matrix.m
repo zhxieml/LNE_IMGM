@@ -4,7 +4,7 @@ function is_valid = check_assign_matrix(assignMat, nodeCnt)
     
     if size(unique(assignMat >= 0), 1) ~= 1 || size(unique(assignMat <= 1), 1) ~= 1
         pause;
-        error("Invalid input: the assignment matrix has negative entries");
+        error("Invalid input: the assignment matrix has error entries");
     end
     
     if matSize(1) ~= matSize(2) || mod(matSize(1), nodeCnt) ~= 0

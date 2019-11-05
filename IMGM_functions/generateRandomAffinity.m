@@ -51,11 +51,11 @@ for gc=1:graphCnt
         affinity.adj{gc} = logical(P<density);
         affinity.edge{gc}(P>=density) = NaN;
         % generate random point-wise feature
-        randomPoint = rand(1,nodeCnt);
+        randomPoint = rand(1,nodeCnt); 
         PN = deform*randn(1,nodeCnt);
         affinity.pointFeat{gc} = randomPoint;
         affinity.pointFeat{gc}(1:nInlier) = basePoint;
-        affinity.pointFeat{gc} = affinity.pointFeat{gc};% add some noises
+        affinity.pointFeat{gc} = affinity.pointFeat{gc} + PN;% add some noises
     else% point matching, first generate the coordinate of 2D points, then derive their distance as edge weiths 
         pointSet = [basePointSet + deform*randn(2,nInlier) randn(2,nOutlier)];
         pointSet = pointSet';
