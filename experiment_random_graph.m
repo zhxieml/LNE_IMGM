@@ -19,7 +19,7 @@ target.config.database = 'synthetic';% only synthetic test is allowed here
 target.config.Sacle_2D = 0.05;
 iterRange = 6;
 graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-algNameSepSpace = '                    ';
+
 algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
 algSet.algEnable =  [ 0,        0,           1,       1,       1,           1,              1,              1,          1];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
@@ -470,7 +470,8 @@ for i=1:length(algSet.algNameSet)
 end
 
 fprintf('--------------------------------------------------------------overall performance-------------------------------------------------------------------\n');
-algNamePreSpace = '                    ';
+algNamePreSpace = '                ';
+algNameSepSpace = '                             ';
 fprintf(fidPerf,'overall mean\n');
 fprintf(algNamePreSpace);
 fprintf(fidPerf,',,');
@@ -483,7 +484,7 @@ fprintf('\n');fprintf(fidPerf,'\n');
 fprintf('grh# itr#  ');fprintf(fidPerf,'grh#, itr#');
 for algk=1:algCnt
     if algSet.algEnable(algk)==0,continue;end
-    fprintf(' acc   scr   con   tim   pair');
+    fprintf(' acc   scr   con   tim   pair ');
     fprintf(fidPerf,', acc,  score, consis, time, pairmatch');
 end
 fprintf('\n');fprintf(fidPerf,'\n');
