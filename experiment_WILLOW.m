@@ -34,7 +34,7 @@ target.config.gtDir = [target.config.dataDir '/ground_truth'];
 target.config.resDir = './res';
 target.config.tmpDir = './tmp';
 target.config.class = 'Duck';
-target.config.category = 'outlier';%'deform','outlier'
+target.config.category = 'deform';%'deform','outlier'
 target.config.distRatioTrue = 0.15;
 target.config.testType = 'formal';% massOutlier
 target.config.constIterImmune = 2;% immune from consistency regularization, only use affinity in earl
@@ -45,14 +45,12 @@ switch target.config.category
     case 'deform' % same setting with 5th row in Table 1 in the PAMI paper 
         target.config.nInlier = 10;
         target.config.nOutlier = 0;
-        target.config.featDir = [target.config.dataDir '\feature_0'];
-        target.config.affinityDir=[target.config.dataDir '\affinity_0'];
+        target.config.featDir = [target.config.dataDir '\feature_4'];
         target.config.complete = 1;
     case 'outlier'
         target.config.nInlier = 10;
         target.config.nOutlier = 4;
         target.config.featDir = [target.config.dataDir '\feature_4'];
-        target.config.affinityDir=[target.config.dataDir '\affinity_4'];
         target.config.complete = 1;
 end
 iterRange = 6;
