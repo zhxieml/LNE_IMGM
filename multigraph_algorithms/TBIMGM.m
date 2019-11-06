@@ -56,12 +56,15 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     case 'CAO'
         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
-        pointFeat = globalVar.pointFeat(included);
-        X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
+%         pointFeat = globalVar.pointFeat(included);
+%         X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
+        nFeature = ones(1, length(included)) * nodeCnt;
+        M_out = QuickMatch(rawMat(subIndies, subIndies), nFeature);
+        X(subIndies, subIndies) = double(full(M_out));
     case 'matchALS'
-        nFeature = ones(length(included), 1) * nodeCnt;
+        nFeature = ones(1, length(included)) * nodeCnt;
         M_out = mmatch_CVX_ALS(rawMat(subIndies, subIndies), nFeature, 'verbose', false, 'univsize', length(subIndies));
-        X(subIndies, subIndies) = full(M_out);
+        X(subIndies, subIndies) = double(full(M_out));
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
