@@ -6,7 +6,7 @@ init_path;
 setPlotColor;
 algpar = setPairwiseSolver();
 
-target.config.bUnaryEnable = 1;%bUnaryEnable=1 use point-wise unary similarity, otherwise not
+target.config.bUnaryEnable = 0;%bUnaryEnable=1 use point-wise unary similarity, otherwise not
 target.config.bEdgeEnable = 1;%bEdgeEnable=1 use edge-wise 2nd-order similarity, otherwise not
 target.config.bAngleEnable = 1;
 target.config.weight = [0, 1, 0]; % weight for Unary, Edge and Angle
@@ -22,7 +22,7 @@ target.config.bPermute = 1;% set the ground truth by identity matrix, other choi
 % target.config.testType = 'formal';% for logic simplicity, this demo code involves only formal case for random graphs Fig.3, another is massOutlier.
 
 
-varyMinGrhCnt=30; varyMaxGrhCnt=50 ; grhTestCnt = 1;% 
+varyMinGrhCnt=30; varyMaxGrhCnt=50; grhTestCnt = 20;% 
 target.config.Sacle_2D = 0.05;
 target.config.database = 'WILLOW-Object-Class';% only synthetic test is allowed here
 
@@ -146,7 +146,7 @@ fprintf('\n');fprintf(fidPerf,'\n');
 load_target_data;
 
 for testk = 1:testCnt
-    fprintf('Run test in round %d\n', testk);
+    fprintf('Run test in round %d/%d\n', testk, testCnt);
 
     affinity = generateAffinity(testk);
     rawMat = generatePairAssignment(algpar,nodeCnt,graphCnt,testk);
@@ -460,7 +460,7 @@ for testk = 1:testCnt
             countPairAve(parak, tbimgm_matchALSIdx, testk) = numPairMatch;
         end    
         
-        fprintf('test in round %d, Start from %d graphs, %d graphs incremented\n',testk, baseGraphCnt, parak*graphStep);
+        fprintf('test in round %d/%d, Start from %d graphs, %d graphs incremented\n',testk, testCnt, baseGraphCnt, parak*graphStep);
         fprintf('%-18s%-18s%-18s%-18s%-18s%-18s\n','field\alg', 'accuracy', 'score', 'consistency', 'time', 'numPairMatch');
         for alg = find(algSet.algEnable)
             fprintf('%-18s%-18f%-18f%-18f%-18f%-18d\n\n',algSet.algNameSet{alg}, accAve(parak, alg, testk), scrAve(parak, alg, testk), conPairAve(parak, alg, testk), timAve(parak, alg, testk), countPairAve(parak, alg, testk));
@@ -524,7 +524,7 @@ end
 legendOff = 0;
 
 current_time = datestr(datetime('now'));
-savePath = sprintf('random_exp_all_inliers.mat');
+savePath = sprintf('willow_%s.mat', target.config.category);
 save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
 ave.accuracy = accAveFull;
 ave.score = scrAveFull;
