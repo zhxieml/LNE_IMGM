@@ -429,10 +429,9 @@ for testk = 1:testCnt
             tEnd = toc(tStart);
             prevMatching{tbimgm_matchALSIdx} = increMatching{tbimgm_matchALSIdx};
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            check_assign_matrix(increMatching{tbimgm_matchALSIdx}, nodeCnt);
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             check_assign_matrix(increMatching{tbimgm_matchALSIdx}, nodeCnt);
+%             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             acc{tbimgm_matchALSIdx} = cal_pair_graph_accuracy(increMatching{tbimgm_matchALSIdx},affinity.GT,target.config.nOutlier,nodeCnt,param.N+graphStep);
             scr{tbimgm_matchALSIdx} = cal_pair_graph_score(increMatching{tbimgm_matchALSIdx},affinity.GT,nodeCnt,param.N+graphStep);
