@@ -24,8 +24,10 @@ function load_target_data
             gtPath = fullfile(gtDir, cls, sprintf("%s_%s_%s.mat", cls, nameXgt(end-7:end-4), nameYgt(end-7:end-4)));
             gt = load(gtPath);
             assert(size(gt.groundTruth.assign, 1) == nInlier, "error size(gt.groundTruth.assign, 1) ~= nInlier\n");
-            target.GT{x, y} = gt.groundTruth.assign;
-            target.GT{y, x} = gt.groundTruth.assign';
+            Xgt = eye(nodeCnt);
+            Xgt(1:nInlier, 1:nInlier) = gt.groundTruth.assign;
+            target.GT{x, y} = Xgt;
+            target.GT{y, x} = Xgt';
         end
     end
     

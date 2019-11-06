@@ -29,19 +29,19 @@ permutation = randperm(totalCnt);
 %permutation = 1:totalCnt;
 for viewk = 1:graphCnt
     vk = permutation(viewk);
-    Data{viewk}.nP = size(target.data{vk}.point,1);%µãµÄÊýÄ¿
-    Data{viewk}.edge = zeros(nodeCnt,nodeCnt);%±ß
-    Data{viewk}.point = target.data{vk}.point;%µãµÄ×ø±ê
-    Data{viewk}.angle = zeros(Data{viewk}.nP,Data{viewk}.nP);%½Ç¶È
-%     %¿¼ÂÇÒ»½×siftÌØÕ÷
+    Data{viewk}.nP = size(target.data{vk}.point,1);%ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+    Data{viewk}.edge = zeros(nodeCnt,nodeCnt);%ï¿½ï¿½
+    Data{viewk}.point = target.data{vk}.point;%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Data{viewk}.angle = zeros(Data{viewk}.nP,Data{viewk}.nP);%ï¿½Ç¶ï¿½
+%     %ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½siftï¿½ï¿½ï¿½ï¿½
 %     for s=1:nodeCnt
 %         Data{viewk}.edge(s,s) = target.data{viewk}.feat
 %     end
-    %¼ÆËãÃ¿Ìõ±ßµÄ³¤¶ÈedgeºÍ½Ç¶Èangle    
+    %ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ßµÄ³ï¿½ï¿½ï¿½edgeï¿½Í½Ç¶ï¿½angle    
     for r = 1:nodeCnt
         for c = r+1:nodeCnt
             Data{viewk}.edge(r,c) = sqrt((target.data{vk}.point(r,1)-target.data{vk}.point(c,1))^2+(target.data{vk}.point(r,2)-target.data{vk}.point(c,2))^2);
-            % atan(X) is in the range [-pi/2,pi/2]. ÏÖÔÚÔÙ×ª³É[-90,90]
+            % atan(X) is in the range [-pi/2,pi/2]. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½[-90,90]
             if target.data{vk}.point(r, :) == target.data{vk}.point(c, :)
                 Data{viewk}.angle(r,c) = 0;
             else
@@ -51,14 +51,14 @@ for viewk = 1:graphCnt
     end
     Data{viewk}.edge = Data{viewk}.edge/max(Data{viewk}.edge(:));
     Data{viewk}.edge = Data{viewk}.edge + Data{viewk}.edge';
-    % ÔÙ×ª³É[-1,1]
+    % ï¿½ï¿½×ªï¿½ï¿½[-1,1]
     Data{viewk}.angle = Data{viewk}.angle/90;
     Data{viewk}.angle = Data{viewk}.angle + Data{viewk}.angle';
             
     Data{viewk}.edgeRaw = Data{viewk}.edge;
     Data{viewk}.angleRaw = Data{viewk}.angle;
     
-    if adjFlag>1%1ÊÇfull connect
+    if adjFlag>1%1ï¿½ï¿½full connect
         tri = delaunay(Data{viewk}.point(:,1),Data{viewk}.point(:,2));
         triNum=size(tri,1);
         Data{viewk}.adjMatrix = zeros( Data{viewk}.nP, Data{viewk}.nP);
@@ -70,34 +70,34 @@ for viewk = 1:graphCnt
             Data{viewk}.adjMatrix(tri(i,1),tri(i,3))=1;
             Data{viewk}.adjMatrix(tri(i,3),tri(i,1))=1;
         end
-    else%1ÊÇfull connect
+    else%1ï¿½ï¿½full connect
         Data{viewk}.adjMatrix = ones(Data{viewk}.nP, Data{viewk}.nP);
     end
     adjlen(viewk) = sum(Data{viewk}.adjMatrix(:));
 end
 switch adjFlag
-    case {1,5}% 1:full connected,5:¸÷¹Ü¸÷
+    case {1,5}% 1:full connected,5:ï¿½ï¿½ï¿½Ü¸ï¿½
         for viewk=1:graphCnt
             Data{viewk}.adjMatrix = logical(Data{viewk}.adjMatrix);
             Data{viewk}.nE = sum(Data{viewk}.adjMatrix(:));
         end
-    case {2,3,4}% 2:²¢¼¯,3:×î´ó¼¯,4:½»¼¯,µ±Ë³Ðò±»´òÂÒµÄÊ±ºò£¬µ¥´¿È¡×î¶à±ßÊý²»work ÐèÒªÏÈÖØ¶ÔÆë ÔÙÈ¡×î´ó±ßÊý
+    case {2,3,4}% 2:ï¿½ï¿½ï¿½ï¿½,3:ï¿½ï¿½ï¿½,4:ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½Ë³ï¿½ò±»´ï¿½ï¿½Òµï¿½Ê±ï¿½ò£¬µï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½work ï¿½ï¿½Òªï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         maxid = find(adjlen==max(adjlen));reference=maxid(1);
         refAdj = Data{reference}.adjMatrix;
         
-        if adjFlag==2||adjFlag==4%2ÊÇ²¢¼¯£¬4ÊÇ½»¼¯£¬ÐèÒª½øÒ»²½³äÊµ»òÕßÏ¡Êèreference adj
+        if adjFlag==2||adjFlag==4%2ï¿½Ç²ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ï¡ï¿½ï¿½reference adj
             for viewk=1:graphCnt
                 if viewk~=reference
-                    %¸üÐÂadjMatrix: reference (r) vs. viewk (v)
+                    %ï¿½ï¿½ï¿½ï¿½adjMatrix: reference (r) vs. viewk (v)
                     permGT = GT((reference-1)*nodeCnt+1:reference*nodeCnt,(viewk-1)*nodeCnt+1:viewk*nodeCnt);
                     permgt = mat2perm(permGT);%permgt(r)=v
-                    if adjFlag==2%²¢¼¯ ×ö¼Ó·¨
+                    if adjFlag==2%ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ó·ï¿½
                         for i=1:nodeCnt
                             for j=i+1:nodeCnt
                                 refAdj(i,j) = refAdj(i,j)+Data{viewk}.adjMatrix(permgt(i),permgt(j));
                             end
                         end
-                    elseif adjFlag==4%½»¼¯ ×ö³Ë·¨
+                    elseif adjFlag==4%ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ë·ï¿½
                         for i=1:nodeCnt
                             for j=i+1:nodeCnt
                                 refAdj(i,j) = refAdj(i,j)*Data{viewk}.adjMatrix(permgt(i),permgt(j));
@@ -109,10 +109,10 @@ switch adjFlag
             end
         end
         refAdj = logical(refAdj);
-        %ÏÂÃæÓÃreference adjÀ´¸üÐÂÆäËûadj
+        %ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½reference adjï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½adj
         for viewk=1:graphCnt
             if viewk~=reference
-                %¸üÐÂadjMatrix: viewk (v) vs. reference (r)
+                %ï¿½ï¿½ï¿½ï¿½adjMatrix: viewk (v) vs. reference (r)
                 permGT = GT((viewk-1)*nodeCnt+1:viewk*nodeCnt,(reference-1)*nodeCnt+1:reference*nodeCnt);
                 permgt = mat2perm(permGT);%permgt(v)=r
                 adj = zeros(nodeCnt,nodeCnt);
@@ -137,12 +137,12 @@ for viewk=1:graphCnt
     %affinity.clusterGT(viewk) = target.clusterGT(vk);
             
     [r,c]=find(~isnan(Data{viewk}.edge));
-    affinity.EG{viewk}=[r,c]';%2*Data.nE{1} ¼´2*±ßµÄÊýÄ¿ µÚÒ»ÐÐÊÇÆðµã µÚ¶þÐÐÊÇÖÕµã
-    Data{viewk}.edgeFeat = Data{viewk}.edge(~isnan(Data{viewk}.edge))';%edgeFeatÊÇÒ»¸ö1*±ßÊýµÄ¾ØÕó,edgeÊÇtriangleµÄmask
+    affinity.EG{viewk}=[r,c]';%2*Data.nE{1} ï¿½ï¿½2*ï¿½ßµï¿½ï¿½ï¿½Ä¿ ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½
+    Data{viewk}.edgeFeat = Data{viewk}.edge(~isnan(Data{viewk}.edge))';%edgeFeatï¿½ï¿½Ò»ï¿½ï¿½1*ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½,edgeï¿½ï¿½triangleï¿½ï¿½mask
     Data{viewk}.angleFeat = Data{viewk}.angle(~isnan(Data{viewk}.angle))';
     %fprintf("length of edgeFeat=%d, length of angleFeat = %d\n", length(Data{viewk}.edgeFeat), length(Data{viewk}.angleFeat));
     if bUnaryEnable
-        Data{viewk}.pointFeat = target.data{vk}.feat';%Ò»ÁÐÊÇÒ»¸öµãµÄfeature @todo
+        Data{viewk}.pointFeat = target.data{vk}.feat';%Ò»ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½feature @todo
     end
     affinity.nP{viewk} = Data{viewk}.nP;
     % incidence matrix
@@ -153,15 +153,15 @@ for viewk=1:graphCnt
     % augumented adjacency
     affinity.H{viewk} = [affinity.G{viewk}, eye(Data{viewk}.nP)];
     affinity.edge{viewk} = Data{viewk}.edge;
-    affinity.edgeRaw{viewk} = Data{viewk}.edgeRaw;%Õâ¸ö¿ÉÒÔÖ±½ÓÓÃÀ´×öadmm
+    affinity.edgeRaw{viewk} = Data{viewk}.edgeRaw;%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½admm
     affinity.angleRaw{viewk} = Data{viewk}.angleRaw;
     affinity.adj{viewk} = Data{viewk}.adjMatrix;
     
 end
-%ÏÂÃæ¼ÆËãaffinity¾ØÕó
+%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½affinityï¿½ï¿½ï¿½ï¿½
 affinity.GT = eye(nodeCnt*graphCnt);
 for xview = 1:graphCnt
-    xview_gt =(xview-1)*nodeCnt+1:(xview-1)*nodeCnt+nInlier;
+    xview_gt =(xview-1)*nodeCnt+1:(xview-1)*nodeCnt+nodeCnt;
 %     for yview = xview+1:graphCnt
     if affinity.BiDir
         yviewSet = [1:xview-1,xview+1:graphCnt];
@@ -170,12 +170,12 @@ for xview = 1:graphCnt
     end
     for yview = yviewSet
         % load ground truth data
-        yview_gt = (yview-1)*nodeCnt+1:(yview-1)*nodeCnt+nInlier;
+        yview_gt = (yview-1)*nodeCnt+1:(yview-1)*nodeCnt+nodeCnt;
         affinity.GT(xview_gt, yview_gt) = target.GT{permutation(xview), permutation(yview)};
-        % % % ¿¼ÂÇÒ»½×ÌØÕ÷ÏàËÆ¶È     
+        % % % ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½     
         if bUnaryEnable%@todo
             featAffinity = conDst(Data{xview}.pointFeat, Data{yview}.pointFeat,0)/10000/128;
-            affinity.KP{xview,yview} = exp(-featAffinity/ Sacle_2D);%ÔõÃ´ÉèÖÃÈ¨ÖØ£¿£¿
+            affinity.KP{xview,yview} = exp(-featAffinity/ Sacle_2D);%ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½È¨ï¿½Ø£ï¿½ï¿½ï¿½
         else
             affinity.KP{xview,yview} = zeros(Data{xview}.nP, Data{yview}.nP);
         end
@@ -183,24 +183,24 @@ for xview = 1:graphCnt
         dq = zeros(length(Data{xview}.edgeFeat),length(Data{yview}.edgeFeat));
         if bEdgeEnable
             if isfield(Data{xview},'edgeFeat') && affinity.edgeAffinityWeight>0
-                dq = dq + affinity.edgeAffinityWeight*conDst(Data{xview}.edgeFeat, Data{yview}.edgeFeat,0);%¼ÆËãÁ½¸öÍ¼Àï±ß±ßÖ®¼äµÄ¾àÀëÆ½·½£¬ÐÎ³É±ßµÄ¾àÀë¾ØÕón1*n2
+                dq = dq + affinity.edgeAffinityWeight*conDst(Data{xview}.edgeFeat, Data{yview}.edgeFeat,0);%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ß±ï¿½Ö®ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½Î³É±ßµÄ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½n1*n2
             end
             if isfield(Data{xview},'angleFeat') && affinity.angleAffinityWeight>0
                 %debug_tmp = conDst(Data{xview}.angleFeat, Data{yview}.angleFeat,1);
                 dq = dq + affinity.angleAffinityWeight*conDst(Data{xview}.angleFeat, Data{yview}.angleFeat,1);
             end
     %         affinity.DQ{xview,yview} = dq;
-            affinity.KQ{xview,yview} = exp(-dq / Sacle_2D);%µ«±ßºÍ±ßÖ®¼äÓÐaffinity Kq£¬ÓÃÖ¸ÊýÐÎÊ½±È½ÏÆ½»¬±ãÓÚÓÅ»¯,ÐÎ³ÉÖ¸Êý»¯ºóµÄ±ß±ß¾ØÕón1*n2
+            affinity.KQ{xview,yview} = exp(-dq / Sacle_2D);%ï¿½ï¿½ï¿½ßºÍ±ï¿½Ö®ï¿½ï¿½ï¿½ï¿½affinity Kqï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ê½ï¿½È½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½,ï¿½Î³ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ß±ß¾ï¿½ï¿½ï¿½n1*n2
     %         affinity.Ct{xview,yview} = ones(size(affinity.KP{xview,yview}));
         else
             affinity.KQ{xview,yview} = dq;
         end
-        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EGÊÇ±ßµÄ¶ËµãµÄË÷Òý£¬2*n1,2*n2
+        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EGï¿½Ç±ßµÄ¶Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2*n1,2*n2
     end
 end
 
-%ÏÂÃæÔÚaffinityÉÏÔö¼ÓÒ»Ð©factorizedµÄÐÅÏ¢
-% ¼´factMultiGraphº¯ÊýµÄÄÚÈÝ
+%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½affinityï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ð©factorizedï¿½ï¿½ï¿½ï¿½Ï¢
+% ï¿½ï¿½factMultiGraphï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 % if affinity.Factorize
 %     for i=1:graphCnt
 %         affinity.HH{i} = affinity.H{i}' * affinity.H{i};
