@@ -1,6 +1,5 @@
 % a simple function to crop the affinity of a specific cluster
-function affinityCrop = cropAffinity(tmpClusterPosition)
-    global affinity
+function affinityCrop = crop_affinity(tmpClusterPosition, affinity)
     affinityCrop.BiDir = affinity.BiDir;
     affinityCrop.edgeAffinityWeight = affinity.edgeAffinityWeight;
     affinityCrop.angleAffinityWeight = affinity.angleAffinityWeight;
@@ -21,6 +20,7 @@ function affinityCrop = cropAffinity(tmpClusterPosition)
     affinityCrop.K = affinity.K(tmpClusterPosition,tmpClusterPosition);
     nDivide = ones([1 affinity.graphCnt])*affinity.nodeCnt;
     cellGT = mat2cell(affinity.GT, nDivide, nDivide);
+    cellGTcrop = cell(length(tmpClusterPosition), length(tmpClusterPosition));
     for i = 1:length(tmpClusterPosition)
         for j = 1:length(tmpClusterPosition)
             cellGTcrop(i,j)=cellGT(tmpClusterPosition(i),tmpClusterPosition(j));

@@ -1,5 +1,6 @@
 addpath('functions');
 addpath('IMGM_functions');
+addpath('helper');
 addpath('gm_algorithm\RRWM\'); % Reweighted Random Walks Matching by Cho et al. ECCV2010
 addpath(genpath('multigraph_algorithms'));
 % addpath('multigraph_algorithms\');
