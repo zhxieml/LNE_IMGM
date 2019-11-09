@@ -23,7 +23,7 @@ target.config.bPermute = 1;% set the ground truth by identity matrix, other choi
 
 
 varyMinGrhCnt=30; varyMaxGrhCnt=50; grhTestCnt = 20;% 
-target.config.Sacle_2D = 0.05;
+target.config.Sacle_2D = 0.1;
 target.config.database = 'WILLOW-Object-Class';% only synthetic test is allowed here
 
 target.config.dataDir = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset';
@@ -33,7 +33,7 @@ target.config.annoDir=[target.config.dataDir '/WILLOW-ObjectClass'];
 target.config.gtDir = [target.config.dataDir '/ground_truth'];
 target.config.resDir = './res';
 target.config.tmpDir = './tmp';
-target.config.class = 'Duck';
+target.config.class = 'Car';
 
 target.config.category = 'outlier';%'deform','outlier'
 target.config.distRatioTrue = 0.15;
@@ -186,6 +186,7 @@ for testk = 1:testCnt
         %%%%%%%%%%%% calculate the incremental matching with cao_pc_raw %%%%%%%%%%%%%%%%%%%%%
         if algSet.algEnable(cao_pc_rawIdx)
             tStart = tic;
+%             increMatching{cao_pc_rawIdx} = CAO(rawMat(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep)), nodeCnt, param.N+graphStep, iterRange, max(max(scrDenomMatInCnt(1:param.N,1:param.N))), 'pair', 1);
             increMatching{cao_pc_rawIdx} = CAO(rawMat(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep)), nodeCnt, param.N+graphStep, iterRange, scrDenomCurrent, 'pair', 1);
             tEnd = toc(tStart);
             

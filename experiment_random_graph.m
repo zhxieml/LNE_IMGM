@@ -10,7 +10,7 @@ setObsoleteVariables;% some old parameters are used for debug and other tests, l
 % random graph test, note not the random point set test as used in mpm
 % testType: different modes for tests, e.g. formal (Fig.3&4), case(Fig.1), iter(Fig.2), massOutlier(Fig.5&6)
 % target.config.testType = 'formal';% for logic simplicity, this demo code involves only formal case for random graphs Fig.3, another is massOutlier.
-target.config.testType = 'formal';% massOutlier
+target.config.testType = 'massOutlier';% massOutlier
 algpar = setPairwiseSolver();
 mpmAlgPar = setMPMAlgPar;
 
