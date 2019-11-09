@@ -2,6 +2,7 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     %%  single step of Incremental Multi Graph Matching
     % 1. in this algorithm, all graph must have equal # of keypoints
     % affScore is a param.N * param.N matrix
+    global target
 
     graphCnt = param.N + param.graphStep;
     MST = zeros(graphCnt, 'logical');
@@ -54,13 +55,20 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     subIndies = getSubIndices(included, nodeCnt);
     switch method.name
     case 'CAO'
-        X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
+        %%%%%%%%%%%%%%%% crop the affinity %%%%%%%%%%%%%%%%%%%%%
+        affinityCrop = crop_affinity(included', globalVar);
+        %%%%%%%%%%%%%%%% crop the target %%%%%%%%%%%%%%%%%%%%%%%
+        targetCrop = crop_target(included', target);
+        
+        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,affinityCrop,targetCrop,method.optType,method.useCstInlier);
+%         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
 %         pointFeat = globalVar.pointFeat(included);
 %         X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
         nFeature = ones(1, length(included)) * nodeCnt;
         M_out = QuickMatch(rawMat(subIndies, subIndies), nFeature);
         X(subIndies, subIndies) = double(full(M_out));
+
     case 'matchALS'
         nFeature = ones(1, length(included)) * nodeCnt;
         M_out = mmatch_CVX_ALS(rawMat(subIndies, subIndies), nFeature, 'verbose', false, 'univsize', length(subIndies));

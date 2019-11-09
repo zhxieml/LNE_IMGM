@@ -1,6 +1,5 @@
 % a simple function to crop the affinity of a specific cluster
-function affinityCrop = cropAffinity(tmpClusterPosition)
-    global affinity
+function affinityCrop = crop_affinity(tmpClusterPosition, affinity)
     affinityCrop.BiDir = affinity.BiDir;
     affinityCrop.edgeAffinityWeight = affinity.edgeAffinityWeight;
     affinityCrop.angleAffinityWeight = affinity.angleAffinityWeight;
