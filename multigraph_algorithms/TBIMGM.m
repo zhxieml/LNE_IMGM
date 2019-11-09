@@ -1,12 +1,6 @@
 function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     %%  single step of Incremental Multi Graph Matching
-<<<<<<< HEAD
-=======
-    % 1. in this algorithm, all graph must have equal # of keypoints
-    % affScore is a param.N * param.N matrix
     global target
->>>>>>> 1623133a3a192f2cb640f08e4f131e00edb785a1
-
     graphCnt = param.N + param.graphStep;
     MST = zeros(graphCnt, 'logical');
     % find MST
@@ -81,25 +75,27 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     end
 
     %% make consistent
-    % r = graphCnt;
-    % rview = (r-1)*nodeCnt+1:r*nodeCnt;
-    % for x = included
-    %     if x == r
-    %         continue;
-    %     end
-    %     xview = (x-1)*nodeCnt+1:x*nodeCnt;
-    %     for y = excluded
-    %         yview = (y-1)*nodeCnt+1:y*nodeCnt;
-    %         Xry_new = X(rview, xview)*X(xview, yview);
-    %         Sry = mat2vec(Xry_new)'*(globalVar.K{r, y}*mat2vec(Xry_new));
-    %         if Sry > affScore(r, y)
-    %             X(rview, yview) = Xry_new;
-    %             X(yview, rview) = Xry_new';
-    %             affScore(r, y) = Sry;
-    %             affScore(y, r) = Sry;
-    %         end
-    %     end
-    % end
+
+    for r = included
+        rview = (r-1)*nodeCnt+1:r*nodeCnt;
+        for x = included
+            if x == r
+                continue;
+            end
+            xview = (x-1)*nodeCnt+1:x*nodeCnt;
+            for y = excluded
+                yview = (y-1)*nodeCnt+1:y*nodeCnt;
+                Xry = X(rview, xview)*X(xview, yview);
+                Sry = mat2vec(Xry)'*(globalVar.K{r, y}*mat2vec(Xry));
+                if Sry > affScore(r, y)
+                    X(rview, yview) = Xry;
+                    X(yview, rview) = Xry';
+                    affScore(r, y) = Sry;
+                    affScore(y, r) = Sry;
+                end
+            end
+        end
+    end
 
     % stk = zeros(1, graphCnt);
     % consistent = MST;

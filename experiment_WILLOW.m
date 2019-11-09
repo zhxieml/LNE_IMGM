@@ -35,7 +35,7 @@ target.config.resDir = './res';
 target.config.tmpDir = './tmp';
 target.config.class = 'Duck';
 
-target.config.category = 'deform';%'deform','outlier'
+target.config.category = 'outlier';%'deform','outlier'
 target.config.distRatioTrue = 0.15;
 target.config.testType = 'formal';% massOutlier
 target.config.constIterImmune = 2;% immune from consistency regularization, only use affinity in earl
@@ -51,7 +51,7 @@ switch target.config.category
         target.config.inCntType = 'all';% set 'all' for "only a few outlier case", e.g. Fig.1&2&3&4
     case 'outlier'
         target.config.nInlier = 10;
-        target.config.nOutlier = 4;
+        target.config.nOutlier = 2;
         target.config.featDir = [target.config.dataDir '\feature_4_full'];
         target.config.complete = 1;
         target.config.inCntType = 'exact';% set 'all' for "only a few outlier case", e.g. Fig.1&2&3&4
