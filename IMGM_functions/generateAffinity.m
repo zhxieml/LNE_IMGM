@@ -26,7 +26,7 @@ end
 adjlen = zeros(graphCnt,1);
 Data = cell(graphCnt,1);
 permutation = randperm(totalCnt);
-%permutation = 1:totalCnt;
+permutation = 1:totalCnt;
 for viewk = 1:graphCnt
     vk = permutation(viewk);
     Data{viewk}.nP = size(target.data{vk}.point,1);%�����Ŀ
@@ -195,7 +195,8 @@ for xview = 1:graphCnt
         else
             affinity.KQ{xview,yview} = dq;
         end
-        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});%EG�ǱߵĶ˵��������2*n1,2*n2
+        affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});
+        %EG�ǱߵĶ˵��������2*n1,2*n2
     end
 end
 

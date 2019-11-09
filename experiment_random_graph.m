@@ -14,14 +14,14 @@ target.config.testType = 'formal';% massOutlier
 algpar = setPairwiseSolver();
 mpmAlgPar = setMPMAlgPar;
 
-varyMinGrhCnt=20; varyMaxGrhCnt=50; grhTestCnt = 1;% 
+varyMinGrhCnt=20; varyMaxGrhCnt=50; grhTestCnt = 20;% 
 target.config.database = 'synthetic';% only synthetic test is allowed here
 target.config.Sacle_2D = 0.05;
 iterRange = 6;
 graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 
-algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
-algSet.algEnable =  [ 0,        0,           0,       0,       0,           0,              1,              1,          0];
+algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
+algSet.algEnable =  [ 1,            1,           1,       1,         0,           1,              1,              0,          0];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};
@@ -49,6 +49,8 @@ end
 graphStep = 1;
 baseGraphCnt = graphMinCnt;
 graphRange = baseGraphCnt:graphStep:graphMaxCnt-graphStep;
+target.config.baseGraphCnt = baseGraphCnt;
+target.config.graphRange = graphRange;
 target.config.initConstWeight = .2; % initial weight for consitency regularizer, suggest 0.2-0.25
 target.config.constStep = 1.1;% inflate parameter, suggest 1.1-1.2
 target.config.constWeightMax = 1;
@@ -60,7 +62,7 @@ target.config.selectGraphMask{1} = 1:graphMaxCnt;
 paraCnt = length(graphRange);
 
 
-[~,cao_pcIdx] = ismember('cao_pc',algSet.algNameSet);
+[~,cao_pcIdx] = ismember('cao_pc_inc',algSet.algNameSet);
 [~,cao_pc_rawIdx] = ismember('cao_pc_raw',algSet.algNameSet);
 [~,imgm_dIdx] = ismember('imgm_d',algSet.algNameSet);
 [~,imgm_rIdx] = ismember('imgm_r',algSet.algNameSet);
@@ -119,10 +121,11 @@ estErr = zeros(testCnt,1);
 %%%%%%%%%%%%%%%%%%  experiment 1 different incremental algorithms %%%%%%%%%%%%%%%%%%%%%
 
 for testk = 1:testCnt
-    fprintf('Run test in round %d\n', testk);
+    fprintf('Run test in round %d/%d\n', testk, testCnt);
 
     affinity = generateRandomAffinity(nInlier,testk); 
-    affinity.GT = repmat(eye(nodeCnt,nodeCnt),graphCnt,graphCnt);
+    Xgt = eye(nodeCnt);
+    affinity.GT = repmat(Xgt,graphCnt,graphCnt);
     sigma = 0;
     % rrwm pairwise match, once for all graph pairs
     rawMat = generatePairAssignment(algpar,nodeCnt,graphCnt,testk);
@@ -163,7 +166,7 @@ for testk = 1:testCnt
             countPairAve(parak, cao_pc_rawIdx, testk) = (param.N+graphStep);
         end
 
-        %%%%%%%%%%% calculate the incremental matching with cao_pc %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%% calculate the incremental matching with cao_pc_inc %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % previous matching: caoPrevMatching
         if algSet.algEnable(cao_pcIdx)
             if parak == 1
@@ -171,8 +174,10 @@ for testk = 1:testCnt
             end
             matTmp{cao_pcIdx} = rawMat(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep));
             matTmp{cao_pcIdx}(1:nodeCnt*param.N,1:nodeCnt*param.N)=prevMatching{cao_pcIdx};
+            scrDenomMatInCntTmp = cal_pair_graph_inlier_score(matTmp{cao_pcIdx},affinity.GT(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep)),nodeCnt,param.N+graphStep,nodeCnt);
+            scrDenom = max(max(scrDenomMatInCntTmp(1:param.N,1:param.N)));
             tStart = tic;
-            increMatching{cao_pcIdx} = CAO(matTmp{cao_pcIdx}, nodeCnt, param.N+graphStep , iterRange, scrDenomCurrent, 'pair',1);
+            increMatching{cao_pcIdx} = CAO(matTmp{cao_pcIdx}, nodeCnt, param.N+graphStep , iterRange, scrDenom, 'pair',1);
             tEnd = toc(tStart);
             prevMatching{cao_pcIdx} = increMatching{cao_pcIdx};
 
@@ -200,7 +205,6 @@ for testk = 1:testCnt
             
 
             simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
-            % param.subMethodParam.scrDenom = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
             param.iterMax = iterRange;
             param.visualization = 0;
             param.method = 1; % isDPP = 1; isAP = 2; isRand = 3; isTIP = 4;
@@ -232,7 +236,6 @@ for testk = 1:testCnt
             conDenomMatInCntTmp = cal_pair_graph_consistency(matTmp{imgm_rIdx},nodeCnt,param.N+graphStep,0);
             
             simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
-            % param.subMethodParam.scrDenom = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
             param.iterMax = iterRange;
             param.visualization = 0;
             param.method = 3; % isDPP = 1; isAP = 2; isRand = 3; isTIP = 4;
@@ -276,7 +279,7 @@ for testk = 1:testCnt
             conDenomMatInCntTmp = cal_pair_graph_consistency(matTmp{tbimgm_cao_pcIdx},nodeCnt,param.N+graphStep,0);
             
             simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
-            param.subMethodParam.scrDenom = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
+            % param.subMethodParam.scrDenom = max(max(scrDenomMatInCntTmp(1:param.N,1:param.N)));
 
             tStart = tic;
             [increMatching{tbimgm_cao_pcIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_cao_pcIdx}, param);
@@ -315,7 +318,7 @@ for testk = 1:testCnt
             conDenomMatInCntTmp = cal_pair_graph_consistency(matTmp{tbimgm_caoIdx},nodeCnt,param.N+graphStep,0);
             
             simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
-            param.subMethodParam.scrDenom = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
+            % param.subMethodParam.scrDenom = max(max(scrDenomMatInCntTmp(1:param.N,1:param.N)));
 
             tStart = tic;
             [increMatching{tbimgm_caoIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_caoIdx}, param);
@@ -354,7 +357,7 @@ for testk = 1:testCnt
             conDenomMatInCntTmp = cal_pair_graph_consistency(matTmp{tbimgm_cao_ucIdx},nodeCnt,param.N+graphStep,0);
             
             simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
-            param.subMethodParam.scrDenom = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
+            % param.subMethodParam.scrDenom = max(max(scrDenomMatInCntTmp(1:param.N,1:param.N)));
 
             tStart = tic;
             [increMatching{tbimgm_cao_ucIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_cao_ucIdx}, param);
@@ -444,7 +447,7 @@ for testk = 1:testCnt
             countPairAve(parak, tbimgm_matchALSIdx, testk) = numPairMatch;
         end    
         
-        fprintf('test in round %d, Start from %d graphs, %d graphs incremented\n',testk, baseGraphCnt, parak*graphStep);
+        fprintf('test in round %d/%d, Start from %d graphs, %d graphs incremented\n',testk, testCnt, baseGraphCnt, parak*graphStep);
         fprintf('%-18s%-18s%-18s%-18s%-18s%-18s\n','field\alg', 'accuracy', 'score', 'consistency', 'time', 'numPairMatch');
         for alg = find(algSet.algEnable)
             fprintf('%-18s%-18f%-18f%-18f%-18f%-18d\n\n',algSet.algNameSet{alg}, accAve(parak, alg, testk), scrAve(parak, alg, testk), conPairAve(parak, alg, testk), timAve(parak, alg, testk), countPairAve(parak, alg, testk));
@@ -509,7 +512,7 @@ end
 legendOff = 0;
 
 current_time = datestr(datetime('now'));
-savePath = sprintf('random_exp_imgm.mat');
+savePath = sprintf('random_online_%s.mat', target.config.category);
 save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
 ave.accuracy = accAveFull;
 ave.score = scrAveFull;

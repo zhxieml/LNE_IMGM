@@ -3,12 +3,13 @@ graphMaxCnt = 30;
 graphStep = 1;
 baseGraphCnt = graphMinCnt;
 graphRange = baseGraphCnt:graphStep:graphMaxCnt-graphStep;
-load('random_exp.mat');
+load('willow_outlier.mat');
 ave.accuracy = accAveFull;
 ave.score = scrAveFull;
 ave.consistency = conPairAveFull;
 ave.time = timAveFull;
 ave.matchingNumber = countPairAveFull;
+set_
 legendOff = 0;
 fields = fieldnames(ave);
 figure(1);
