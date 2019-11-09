@@ -20,6 +20,7 @@ function affinityCrop = crop_affinity(tmpClusterPosition, affinity)
     affinityCrop.K = affinity.K(tmpClusterPosition,tmpClusterPosition);
     nDivide = ones([1 affinity.graphCnt])*affinity.nodeCnt;
     cellGT = mat2cell(affinity.GT, nDivide, nDivide);
+    cellGTcrop = cell(length(tmpClusterPosition), length(tmpClusterPosition));
     for i = 1:length(tmpClusterPosition)
         for j = 1:length(tmpClusterPosition)
             cellGTcrop(i,j)=cellGT(tmpClusterPosition(i),tmpClusterPosition(j));
