@@ -49,6 +49,8 @@ end
 graphStep = 1;
 baseGraphCnt = graphMinCnt;
 graphRange = baseGraphCnt:graphStep:graphMaxCnt-graphStep;
+target.config.baseGraphCnt = baseGraphCnt;
+target.config.graphRange = graphRange;
 target.config.initConstWeight = .2; % initial weight for consitency regularizer, suggest 0.2-0.25
 target.config.constStep = 1.1;% inflate parameter, suggest 1.1-1.2
 target.config.constWeightMax = 1;

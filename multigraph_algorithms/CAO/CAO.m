@@ -11,7 +11,7 @@
 % P is the processed rawMat
 function P = CAO(rawMat,nodeCnt,graphCnt,iterMax,scrDenom,optType,useCstInlier)
     if iterMax==0,P = rawMat;return;end % if no iteration needed, just return the raw and initial matchings
-%     global  matchMat %  inlierMask %used in the sub-calling function in this file
+    global  matchMat %  inlierMask %used in the sub-calling function in this file
     global target % set in other files
 %     useCstInlier = target.config.useCstInlier;%set to 1 if use consistency to mask inliers, otherwise use affinity metrics
     inCnt = target.config.inCnt;% the number of inliers, can be specified to different values by manual or automatically 
@@ -56,10 +56,10 @@ function P = CAO(rawMat,nodeCnt,graphCnt,iterMax,scrDenom,optType,useCstInlier)
             % different fitness function desgin based on setting optType and iteration stage
             if iter<constIterImmune&&(strcmp(optType,'exact')||strcmp(optType,'pair')||strcmp(optType,'unary'))% for CAO-C, CAO-PC, CAO-UC, in early immune stage, only affinity is boosted
                 tempMat(xscope,yscope) = find1stOrderPathByScoreUnaryPairConsistency(...
-                    xview,yview,unaryListConsistency{curIdx},pairListConsistency{curIdx},nodeCnt,graphCnt,constWeight,scrDenom,'afnty',massOutlierMode,inlierMask, matchMat);
+                    xview,yview,unaryListConsistency{curIdx},pairListConsistency{curIdx},nodeCnt,graphCnt,constWeight,scrDenom,'afnty',massOutlierMode,inlierMask);
             else% CAO or its consistency version (replace affinity score by consistency CAO^{cst})
                 tempMat(xscope,yscope) = find1stOrderPathByScoreUnaryPairConsistency(...
-                    xview,yview,unaryListConsistency{curIdx},pairListConsistency{curIdx},nodeCnt,graphCnt,constWeight,scrDenom,optType,massOutlierMode,inlierMask, matchMat);
+                    xview,yview,unaryListConsistency{curIdx},pairListConsistency{curIdx},nodeCnt,graphCnt,constWeight,scrDenom,optType,massOutlierMode,inlierMask);
             end
         end%for vk
         matchMatOld = matchMat;% keep the solution of last iteration for debug
@@ -78,7 +78,7 @@ function P = CAO(rawMat,nodeCnt,graphCnt,iterMax,scrDenom,optType,useCstInlier)
         end
         % update unary consistency for each graph(Definition 1) and pairwise consistency for each graph pair (Definition 2)
         unaryListConsistency{lastIdx} = unaryListConsistency{curIdx};
-        unaryListConsistency{curIdx} = cal_single_graph_consistency(matchMat,nodeCnt,graphCnt,massOutlierMode,inlierMask);%0.001ÃëµÄÔËÐÐÊ±¼ä
+        unaryListConsistency{curIdx} = cal_single_graph_consistency(matchMat,nodeCnt,graphCnt,massOutlierMode,inlierMask);%0.001ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
         pairListConsistency{lastIdx} = pairListConsistency{curIdx};
         pairListConsistency{curIdx} = cal_pair_graph_consistency(matchMat,nodeCnt,graphCnt,massOutlierMode,inlierMask);
 
@@ -92,9 +92,9 @@ function P = CAO(rawMat,nodeCnt,graphCnt,iterMax,scrDenom,optType,useCstInlier)
     P = matchMat;
 
 function P = find1stOrderPathByScoreUnaryPairConsistency(xview,yview,unaryListConsistency,pairListConsistency,...
-    nodeCnt,graphCnt,constWeight,scrDenom,metricType,massOutlierMode,inlierMask, matchMat)
+    nodeCnt,graphCnt,constWeight,scrDenom,metricType,massOutlierMode,inlierMask)
     global affinity %inlierMask
-%     global matchMat
+    global matchMat
     pairCon = zeros(graphCnt,1);% it is dynamically generated, shall not use the input pairListConsistency, see Eq.10 in the PAMI paper,
     xscope = (xview-1)*nodeCnt+1:xview*nodeCnt;% the xview-th graph
     yscope = (yview-1)*nodeCnt+1:yview*nodeCnt;% the yview-th graph

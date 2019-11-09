@@ -78,7 +78,7 @@ function P = CAO_local(rawMat,nodeCnt,graphCnt,iterMax,scrDenom,affinity, target
         end
         % update unary consistency for each graph(Definition 1) and pairwise consistency for each graph pair (Definition 2)
         unaryListConsistency{lastIdx} = unaryListConsistency{curIdx};
-        unaryListConsistency{curIdx} = cal_single_graph_consistency(matchMat,nodeCnt,graphCnt,massOutlierMode,inlierMask);%0.001ÃëµÄÔËÐÐÊ±¼ä
+        unaryListConsistency{curIdx} = cal_single_graph_consistency(matchMat,nodeCnt,graphCnt,massOutlierMode,inlierMask);%0.001ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
         pairListConsistency{lastIdx} = pairListConsistency{curIdx};
         pairListConsistency{curIdx} = cal_pair_graph_consistency(matchMat,nodeCnt,graphCnt,massOutlierMode,inlierMask);
 
@@ -102,7 +102,7 @@ function P = find1stOrderPathByScoreUnaryPairConsistency(xview,yview,affinity, u
     for anchor=1:graphCnt
         ascope = (anchor-1)*nodeCnt+1:anchor*nodeCnt;
         P1 = matchMat(xscope,ascope);P2 = matchMat(ascope,yscope);
-        Y(:,anchor) = mat2vec(P1*P2);% store P_{xy} = P_{xa}*P_{ay}
+        Y(:,anchor) = mat2vec(P1*P2); % store P_{xy} = P_{xa}*P_{ay}
         if strcmp(metricType,'pair')% see Eq.10 in the PAMI paper, compute the pairwise consistency
             pairCon(anchor) = sqrt(pairListConsistency(xview,anchor)*pairListConsistency(anchor,yview));
         end
