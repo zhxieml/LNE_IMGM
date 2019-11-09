@@ -26,7 +26,7 @@ varyMinGrhCnt=30; varyMaxGrhCnt=50; grhTestCnt = 20;%
 target.config.Sacle_2D = 0.05;
 target.config.database = 'WILLOW-Object-Class';% only synthetic test is allowed here
 
-target.config.dataDir = 'D:\zchen\data\WILLOW-ObjectClass-dataset';
+target.config.dataDir = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset';
 target.config.imgDir=[target.config.dataDir '/WILLOW-ObjectClass'];
 target.config.annoDir=[target.config.dataDir '/WILLOW-ObjectClass'];
 
