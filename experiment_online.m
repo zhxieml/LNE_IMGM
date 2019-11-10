@@ -6,11 +6,10 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=4; 
-target.config.graphMaxCnt=28; 
-target.config.testCnt = 10;% 
+target.config.graphMinCnt=30; 
+target.config.graphMaxCnt=50; 
+target.config.testCnt = 1;% 
 target.config.maxNumSearch = 20;
-target.config.iterRange = 6;
 graphStep = 1;
 target.config.database = "willow"; % "willow", "synthetic", "CMU-sequence"
 load_target_data;
@@ -18,7 +17,7 @@ load_target_data;
 % set algorithms
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc_inc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao_c','tbimgm_cao_pc','tbimgm_cao_cst','tbimgm_qm','tbimgm_matchALS'};
-algSet.algEnable =  [ 0,           1,            0,       0,       0,           0,              0,              0,          0];
+algSet.algEnable =  [ 1,           1,            1,       1,       1,            1,              1,              0,          0];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};
@@ -47,17 +46,18 @@ graphCnt = target.config.graphCnt;
 
 % algorithms for affinity and CAO
 target.config.Sacle_2D = 0.05;
+target.config.iterRange = 6;
 target.config.distRatioTrue = 0.15;
-target.config.testType = 'formal';% massOutlier
-target.config.constStep = 1.1;% the inflate parameter, e.g. 1.05-1.1
+target.config.testType = 'all';% massOutlier
+target.config.constStep = 1.05;% the inflate parameter, e.g. 1.05-1.1
 target.config.constWeightMax = 1;% the upperbound, always set to 1
-target.config.initConstWeight = .2; % initial weight for consitency regularizer, suggest 0.2-0.25
+target.config.initConstWeight = 0.2; % initial weight for consitency regularizer, suggest 0.2-0.25
 target.config.constIterImmune = 2; % in early iterations, not involve consistency, suggest 1-3
 target.config.edgeAffinityWeight = 0.9;% in random graphs, only edge affinity is used, angle is meaningless
 target.config.angleAffinityWeight = 1 - target.config.edgeAffinityWeight;
 target.config.selectNodeMask = 1:1:nInlier+target.config.nOutlier;
 target.config.selectGraphMask{1} = 1:target.config.graphMaxCnt;
-target.config.connect = 'fc';
+target.config.connect = 'nfc';
 
 % data for experiment
 paraCnt = length(target.config.graphRange);% paraCnt: iterate over graph #
@@ -121,7 +121,7 @@ for testk = 1:testCnt
         param.N = baseGraphCnt + (parak-1)*graphStep; % 20
         param.graphStep = graphStep;
         scrDenomCurrent = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
-        baseMat = CAO(rawMat(1:nodeCnt*param.N,1:nodeCnt*param.N), nodeCnt, param.N, target.config.iterRange,scrDenomCurrent, 'afnty',1);
+        baseMat = CAO(rawMat(1:nodeCnt*param.N,1:nodeCnt*param.N), nodeCnt, param.N, target.config.iterRange,scrDenomCurrent, 'pair',1);
         
         %%%%%%%%%%%% calculate the incremental matching with cao_pc_raw %%%%%%%%%%%%%%%%%%%%%
         if algSet.algEnable(cao_pc_rawIdx)

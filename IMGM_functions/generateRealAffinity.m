@@ -1,5 +1,6 @@
 function [affinity]= generateRealAffinity(testk)
-    global target GT
+    global target 
+    % GT = cell2mat(target.GT);
     bUnaryEnable = target.config.bUnaryEnable;
     bEdgeEnable = target.config.bEdgeEnable;
     affinity.BiDir = target.config.affinityBiDir;
@@ -25,12 +26,11 @@ function [affinity]= generateRealAffinity(testk)
     adjlen = zeros(graphCnt,1);
     Data = cell(graphCnt,1);
     permutation = randperm(totalCnt);
-    
     for viewk = 1:graphCnt
         vk = permutation(viewk);
-        Data{viewk}.nP = size(target.data{vk}.point,1);%�����Ŀ
+        Data{viewk}.nP = size(target.data{vk}.point,1);%������?
         Data{viewk}.edge = zeros(nodeCnt,nodeCnt);%��
-        Data{viewk}.point = target.data{vk}.point;%�������
+        Data{viewk}.point = target.data{vk}.point;%�������?
         Data{viewk}.angle = zeros(Data{viewk}.nP,Data{viewk}.nP);%�Ƕ�
     %     %����һ��sift����
     %     for s=1:nodeCnt
@@ -80,7 +80,7 @@ function [affinity]= generateRealAffinity(testk)
                 Data{viewk}.adjMatrix = logical(Data{viewk}.adjMatrix);
                 Data{viewk}.nE = sum(Data{viewk}.adjMatrix(:));
             end
-        case {2,3,4}% 2:����,3:���,4:����,��˳�򱻴��ҵ�ʱ�򣬵���ȡ��������work ��Ҫ���ض��� ��ȡ������
+        case {2,3,4}% 2:����,3:���?,4:����,��˳�򱻴��ҵ�ʱ�򣬵���ȡ��������work ��Ҫ���ض��� ��ȡ������
             maxid = find(adjlen==max(adjlen));reference=maxid(1);
             refAdj = Data{reference}.adjMatrix;
             
@@ -136,7 +136,7 @@ function [affinity]= generateRealAffinity(testk)
         %affinity.clusterGT(viewk) = target.clusterGT(vk);
                 
         [r,c]=find(~isnan(Data{viewk}.edge));
-        affinity.EG{viewk}=[r,c]';%2*Data.nE{1} ��2*�ߵ���Ŀ ��һ������� �ڶ������յ�
+        affinity.EG{viewk}=[r,c]';%2*Data.nE{1} ��2*�ߵ���Ŀ ��һ�������? �ڶ������յ�
         Data{viewk}.edgeFeat = Data{viewk}.edge(~isnan(Data{viewk}.edge))';%edgeFeat��һ��1*�����ľ���,edge��triangle��mask
         Data{viewk}.angleFeat = Data{viewk}.angle(~isnan(Data{viewk}.angle))';
         %fprintf("length of edgeFeat=%d, length of angleFeat = %d\n", length(Data{viewk}.edgeFeat), length(Data{viewk}.angleFeat));
@@ -158,9 +158,9 @@ function [affinity]= generateRealAffinity(testk)
         
     end
     %�������affinity����
-    affinity.GT = eye(nodeCnt*graphCnt);
+    affinity.GT = repmat(eye(nodeCnt), graphCnt, graphCnt);
     for xview = 1:graphCnt
-        xview_gt =(xview-1)*nodeCnt+1:(xview-1)*nodeCnt+nodeCnt;
+        % xview_gt =(xview-1)*nodeCnt+1:xview*nodeCnt;
     %     for yview = xview+1:graphCnt
         if affinity.BiDir
             yviewSet = [1:xview-1,xview+1:graphCnt];
@@ -169,8 +169,8 @@ function [affinity]= generateRealAffinity(testk)
         end
         for yview = yviewSet
             % load ground truth data
-            yview_gt = (yview-1)*nodeCnt+1:(yview-1)*nodeCnt+nodeCnt;
-            affinity.GT(xview_gt, yview_gt) = target.GT{permutation(xview), permutation(yview)};
+            % yview_gt = (yview-1)*nodeCnt+1:yview*nodeCnt;
+            % affinity.GT(xview_gt, yview_gt) = target.GT{permutation(xview), permutation(yview)};
             % % % ����һ���������ƶ�     
             if bUnaryEnable%@todo
                 featAffinity = conDst(Data{xview}.pointFeat, Data{yview}.pointFeat,0)/10000/128;
@@ -182,7 +182,7 @@ function [affinity]= generateRealAffinity(testk)
             dq = zeros(length(Data{xview}.edgeFeat),length(Data{yview}.edgeFeat));
             if bEdgeEnable
                 if isfield(Data{xview},'edgeFeat') && affinity.edgeAffinityWeight>0
-                    dq = dq + affinity.edgeAffinityWeight*conDst(Data{xview}.edgeFeat, Data{yview}.edgeFeat,0);%��������ͼ��߱�֮��ľ���ƽ�����γɱߵľ������n1*n2
+                    dq = dq + affinity.edgeAffinityWeight*conDst(Data{xview}.edgeFeat, Data{yview}.edgeFeat,0);%��������ͼ��߱��?��ľ���ƽ�����γɱߵľ������n1*n2
                 end
                 if isfield(Data{xview},'angleFeat') && affinity.angleAffinityWeight>0
                     %debug_tmp = conDst(Data{xview}.angleFeat, Data{yview}.angleFeat,1);
@@ -195,7 +195,7 @@ function [affinity]= generateRealAffinity(testk)
                 affinity.KQ{xview,yview} = dq;
             end
             affinity.K{xview,yview} = conKnlGphKU(affinity.KP{xview,yview}, affinity.KQ{xview,yview}, affinity.EG{xview},affinity.EG{yview});
-            %EG�ǱߵĶ˵��������2*n1,2*n2
+            %EG�ǱߵĶ˵��������?2*n1,2*n2
         end
     end
     
