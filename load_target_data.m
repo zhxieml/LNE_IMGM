@@ -3,7 +3,7 @@ function load_target_data
 
     switch target.config.database
     case "willow"
-        target.config.dataDir = 'D:\zchen\data\WILLOW-ObjectClass-dataset';
+        target.config.dataDir = 'C:\Users\zchen\Documents\GitHub\WILLOW-ObjectClass-dataset';
         target.config.imgDir=[target.config.dataDir '/WILLOW-ObjectClass'];
         target.config.annoDir=[target.config.dataDir '/WILLOW-ObjectClass'];
         target.config.gtDir = [target.config.dataDir '/ground_truth'];
@@ -15,7 +15,7 @@ function load_target_data
             case 'deform' % same setting with 5th row in Table 1 in the PAMI paper 
                 target.config.nInlier = 10;
                 target.config.nOutlier = 0;
-                target.config.featDir = [target.config.dataDir '\feature_4_cao'];
+                target.config.featDir = [target.config.dataDir '\feature_4_inBox'];
                 target.config.complete = 1;
                 target.config.inCntType = 'all';% set 'all' for "only a few outlier case", e.g. Fig.1&2&3&4
             case 'outlier'

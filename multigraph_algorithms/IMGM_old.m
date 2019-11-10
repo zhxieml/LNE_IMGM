@@ -115,7 +115,7 @@ function M = IMGM_old(affScore, rawMat, param)
         tmpRawMat = cell2mat(cropMat);
         affScoreCurrent = affScore(tmpClusterPosition,tmpClusterPosition);
         scrDenom = max(max(affScoreCurrent(1:end,1:end)));
-        iXmatching = CAO_local(tmpRawMat,n,iClusterSize,param.iterMax, scrDenom,affinityCrop, targetCrop,'pair',1); % perform CAO_pc
+        iXmatching = CAO_local(tmpRawMat,n,iClusterSize,param.iterMax, scrDenom,affinityCrop, targetCrop,'exact',1); % perform CAO_c
         iDivide = ones([1 iClusterSize])*n;
         tmpMatching{i}=mat2cell(iXmatching,iDivide, iDivide);
     end
