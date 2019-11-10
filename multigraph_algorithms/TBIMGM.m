@@ -57,8 +57,8 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
         %%%%%%%%%%%%%%%% crop the target %%%%%%%%%%%%%%%%%%%%%%%
         targetCrop = crop_target(included', target);
 
-        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom * 0.9,affinityCrop,targetCrop,method.optType,method.useCstInlier);
-%         X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,affinityCrop,targetCrop,method.optType,method.useCstInlier);
+%         X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom * 0.9,affinityCrop,targetCrop,method.optType,method.useCstInlier);
+        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,affinityCrop,targetCrop,method.optType,method.useCstInlier);
 %         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
 %         pointFeat = globalVar.pointFeat(included);

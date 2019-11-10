@@ -1,7 +1,9 @@
 function P = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param)
     global affinity
     
-    orderedRawMat = cal_adaptive_graph_order(rawMat, nodeCnt, graphCnt);
+    if param.adaptive_order
+        rawMat = cal_adaptive_graph_order(rawMat, nodeCnt, graphCnt);
+    end
     
     baseGraphCnt = 20;
     paraCnt = graphCnt - baseGraphCnt;
@@ -9,10 +11,10 @@ function P = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param)
     sigma = 0;
     
     % # outliers = 0
-    scrDenomMatInCnt = cal_pair_graph_inlier_score(orderedRawMat,affinity.GT,nodeCnt,graphCnt,nodeCnt);
-    conDenomMatInCnt = cal_pair_graph_consistency(orderedRawMat,nodeCnt,graphCnt,0);
+    scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,nodeCnt);
+    conDenomMatInCnt = cal_pair_graph_consistency(rawMat,nodeCnt,graphCnt,0);
     
-    prevMatching = orderedRawMat(1:nodeCnt*baseGraphCnt, 1:nodeCnt*baseGraphCnt);
+    prevMatching = rawMat(1:nodeCnt*baseGraphCnt, 1:nodeCnt*baseGraphCnt);
     
     param.n = nodeCnt;
     param.graphStep = graphStep;
@@ -20,7 +22,7 @@ function P = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param)
     for parak = 1:paraCnt
         param.N = baseGraphCnt + (parak-1)*graphStep;
         
-        matTmp = orderedRawMat(1:nodeCnt*(param.N+graphStep), 1:nodeCnt*(param.N+graphStep));
+        matTmp = rawMat(1:nodeCnt*(param.N+graphStep), 1:nodeCnt*(param.N+graphStep));
         matTmp(1:nodeCnt*param.N,1:nodeCnt*param.N) = prevMatching;
         
         scrDenomMatInCntTmp = scrDenomMatInCnt(1:param.N+graphStep, 1:param.N+graphStep);
