@@ -17,10 +17,11 @@ mpmAlgPar = setMPMAlgPar;
 varyMinGrhCnt=20; varyMaxGrhCnt=50; grhTestCnt = 20;% 
 target.config.database = 'synthetic';% only synthetic test is allowed here
 target.config.Sacle_2D = 0.05;
+target.config.num
 iterRange = 6;
 graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 
-algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
+algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw','imgm_d','imgm_r','tbimgm_cao_c','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS'};
 algSet.algEnable =  [ 1,            1,           1,       1,         0,           1,              1,              0,          0];
 algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
@@ -66,7 +67,7 @@ paraCnt = length(graphRange);
 [~,cao_pc_rawIdx] = ismember('cao_pc_raw',algSet.algNameSet);
 [~,imgm_dIdx] = ismember('imgm_d',algSet.algNameSet);
 [~,imgm_rIdx] = ismember('imgm_r',algSet.algNameSet);
-[~,tbimgm_caoIdx] = ismember('tbimgm_cao', algSet.algNameSet);
+[~,tbimgm_caoIdx] = ismember('tbimgm_cao_c', algSet.algNameSet);
 [~,tbimgm_cao_pcIdx] = ismember('tbimgm_cao_pc', algSet.algNameSet);
 [~,tbimgm_cao_ucIdx] = ismember('tbimgm_cao_uc', algSet.algNameSet);
 [~,tbimgm_qmIdx] = ismember('tbimgm_qm', algSet.algNameSet);
@@ -297,7 +298,7 @@ for testk = 1:testCnt
             countPairAve(parak, tbimgm_cao_pcIdx, testk) = numPairMatch;
         end
 
-       %%%%%%%%%%%% calculate the incremental matching with tbimgm_cao %%%%%%%%%%%%%%%%%%%%
+       %%%%%%%%%%%% calculate the incremental matching with tbimgm_cao_c %%%%%%%%%%%%%%%%%%%%
         if algSet.algEnable(tbimgm_caoIdx)
             % param for tbimgm_caoIdx
             param.subMethodParam.name = 'CAO';
