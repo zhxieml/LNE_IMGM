@@ -22,7 +22,7 @@ graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS', 'tbimgm_cao_pc_ordered'};
 algSet.algEnable =  [ 1,        0,           0,       0,          0,           1,              0,              0,            0,                     1];
-algSet.algColor = {cao_pcClr,cao_pc_rawClr,imgm_dClr,imgm_rClr, tbimgm_caoClr, tbimgm_cao_pcClr, tbimgm_cao_ucClr, tbimgm_qmClr, tbimgm_matchALSClr, tbimgm_cao_pcClr};
+algSet.algColor = {imgm_rClr,imgm_rClr,imgm_dClr,imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};
 target.config.bGraphMatch = 1;

@@ -1,14 +1,13 @@
-function P = IMGM_offline(rawMat,nodeCnt,graphCnt,param)
+function [P, numPairMatch] = IMGM_offline(rawMat,nodeCnt,graphCnt,param)
     global affinity
         
     baseGraphCnt = 2;
     paraCnt = graphCnt - baseGraphCnt;
     graphStep = 1;
-    sigma = 0;
+    numPairMatch = 0;
     
     % # outliers = 0
-    scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,nodeCnt);
-    conDenomMatInCnt = cal_pair_graph_consistency(rawMat,nodeCnt,graphCnt,0);
+%     scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,nodeCnt);
     
     prevMatching = rawMat(1:nodeCnt*baseGraphCnt, 1:nodeCnt*baseGraphCnt);
     
@@ -21,13 +20,13 @@ function P = IMGM_offline(rawMat,nodeCnt,graphCnt,param)
         matTmp = rawMat(1:nodeCnt*(param.N+graphStep), 1:nodeCnt*(param.N+graphStep));
         matTmp(1:nodeCnt*param.N,1:nodeCnt*param.N) = prevMatching;
         
-        scrDenomMatInCntTmp = scrDenomMatInCnt(1:param.N+graphStep, 1:param.N+graphStep);
-        conDenomMatInCntTmp = conDenomMatInCnt(1:param.N+graphStep, 1:param.N+graphStep);
+        scrDenomMatInCntTmp = cal_pair_graph_inlier_score(matTmp,affinity.GT(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep)),nodeCnt,param.N+graphStep,nodeCnt);
         
-        simAP = (1-sigma)*scrDenomMatInCntTmp + sigma*conDenomMatInCntTmp;
+        simAP = scrDenomMatInCntTmp;
 
         increMatching = IMGM_old(simAP, matTmp, param);
         prevMatching = increMatching;
+        numPairMatch = numPairMatch + param.N + graphStep;
     end
     
     P = increMatching;
