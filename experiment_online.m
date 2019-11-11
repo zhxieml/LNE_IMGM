@@ -8,19 +8,19 @@ setObsoleteVariables;
 
 target.config.graphMinCnt=19; 
 target.config.graphMaxCnt=50; 
-target.config.testCnt = 10;% v
+target.config.testCnt = 20;% v
 target.config.maxNumSearch = 20;
 graphStep = 1;
-target.config.database = "willow"; % "willow", "synthetic", "CMU-sequence"
+target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
 % set algorithms
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw', 'cao_c_inc','cao_c_raw','imgm_d','imgm_r','tbimgm_cao_c','tbimgm_cao_pc','tbimgm_cao_cst', 'tbimgm_qm', 'tbimgm_matchALS'};
 algSet.algEnable =  [ 0,            0,             1,           1,          1,       1,       1,              0,              0,               0,             0];
-algSet.algColor = { cao_pcClr,cao_pc_rawClr,cao_cClr,cao_c_rawClr,imgm_dClr,imgm_rClr, tbimgm_cao_cClr, tbimgm_cao_pcClr, tbimgm_cao_cstClr, tbimgm_qmClr, tbimgm_matchALSClr};
-algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-', '--', '-'};
-algSet.algMarker = {'.','.','.','.','.','.','.','.','.', '.', '.'};
+algSet.algColor = { cao_pcClr, cao_pc_rawClr, cao_cClr,cao_c_rawClr,imgm_dClr,imgm_rClr, tbimgm_cao_cClr, tbimgm_cao_pcClr, tbimgm_cao_cstClr, tbimgm_qmClr, tbimgm_matchALSClr};
+algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-', '--', '-', '--'};
+algSet.algMarker = {'.','.','.','.','.','.','.','.','.', '.', '.', '.'};
 
 [~,cao_pcIdx] = ismember('cao_pc_inc',algSet.algNameSet);
 [~,cao_pc_rawIdx] = ismember('cao_pc_raw',algSet.algNameSet);
