@@ -1,7 +1,7 @@
 function P = IMGM_offline(rawMat,nodeCnt,graphCnt,param)
     global affinity
         
-    baseGraphCnt = 20;
+    baseGraphCnt = 2;
     paraCnt = graphCnt - baseGraphCnt;
     graphStep = 1;
     sigma = 0;

@@ -1,6 +1,6 @@
 % nInlier: number of inliers
 % testk: a number for recording the current tesk number
-function affinity = generateRandomAffinity(nInlier,testk)
+function affinity = generateRandomAffinity(testk)
 global target
 affinity.BiDir = target.config.affinityBiDir;
 affinity.edgeAffinityWeight = target.config.edgeAffinityWeight;
@@ -14,6 +14,7 @@ deform = target.config.deform;
 density = target.config.density;
 nOutlier = target.config.nOutlier;
 complete = target.config.complete;
+nInlier = target.config.nInlier;
 nodeCnt = nInlier + nOutlier;
 affinity.graphCnt = graphCnt;
 affinity.nodeCnt = nodeCnt;

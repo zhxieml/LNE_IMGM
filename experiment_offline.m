@@ -100,7 +100,7 @@ conPairStd = zeros(algCnt,testCnt);conPairStdFull = zeros(paraCnt,algCnt);
 acc = cell(1, algCnt);
 scr = cell(1, algCnt);
 con = cell(1, algCnt);
-prevMatching = cell(1, algCnt);
+% prevMatching = cell(1, algCnt);
 Matching = cell(1, algCnt);
 matTmp = cell(1, algCnt);
 

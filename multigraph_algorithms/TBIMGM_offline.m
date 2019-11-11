@@ -5,7 +5,7 @@ function P = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param)
         rawMat = cal_adaptive_graph_order(rawMat, nodeCnt, graphCnt);
     end
     
-    baseGraphCnt = 20;
+    baseGraphCnt = 2;
     paraCnt = graphCnt - baseGraphCnt;
     graphStep = 1;
     sigma = 0;
