@@ -15,7 +15,7 @@ function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, b
     if useAptOrder && batchSize > 1
         % calculate adaptive order 
         dimN = baseGraphCnt*nodeCnt + 1: (baseGraphCnt+batchSize)*nodeCnt;
-        aptOrder = cal_adaptive_graph_order(rawMat(dimN, dimN),nodeCnt,batchSize);
+        aptOrder = cal_adaptive_graph_order(rawMat(dimN, dimN),nodeCnt,batchSize, 'a');
         aptOrder = aptOrder + baseGraphCnt;
         aptOrder = [1:baseGraphCnt, aptOrder']; % length(aptOrder) = baseGraphCnt + batchSize
         % reorder rawMat, affinity and target
