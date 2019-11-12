@@ -8,7 +8,7 @@ setObsoleteVariables;
 
 target.config.graphMinCnt=20; 
 target.config.graphMaxCnt=52; 
-target.config.testCnt = 20;% v
+target.config.testCnt = 10;% v
 target.config.batchRange = [1, 4, 8, 16, 32];
 target.config.maxNumSearch = 20;
 target.config.database = "synthetic"; % "willow", "synthetic"
@@ -122,6 +122,8 @@ for testk = 1:testCnt
     target.pairwiseMask{1} = ones(graphCnt*nodeCnt,graphCnt*nodeCnt);
     scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,target.config.inCnt);
     scrDenomMatInCntGT = cal_pair_graph_inlier_score(affinity.GT,affinity.GT,nodeCnt,graphCnt,target.config.inCnt);
+    scrDenomCurrent = max(max(scrDenomMatInCnt(1:baseGraphCnt,1:baseGraphCnt)));
+    baseMat = CAO(rawMat(1:nodeCnt*baseGraphCnt,1:nodeCnt*baseGraphCnt), nodeCnt, baseGraphCnt, target.config.iterRange, scrDenomCurrent, 'pair',1);
     for xk = 1:xCnt
         batchSize = target.config.batchRange(xk);
         target.config.graphRange = baseGraphCnt:batchSize:target.config.graphMaxCnt-batchSize;
@@ -133,13 +135,8 @@ for testk = 1:testCnt
         countPairAve = zeros(xCnt, paraCnt, algCnt,testCnt);
         for parak = 1:paraCnt 
             param.n = nodeCnt; 
-            param.N = baseGraphCnt + (parak-1)*batchSize; % 20
-            
+            param.N = baseGraphCnt + (parak-1)*batchSize;
             param.batchSize = batchSize;
-            scrDenomCurrent = max(max(scrDenomMatInCnt(1:param.N,1:param.N)));
-            baseMat = CAO(rawMat(1:nodeCnt*param.N,1:nodeCnt*param.N), nodeCnt, param.N, target.config.iterRange,scrDenomCurrent, 'pair',1);
-            % baseMat = rawMat(1:nodeCnt*param.N,1:nodeCnt*param.N);
-
             %%%%%%%%%%%% calculate the incremental matching with cao_c_raw %%%%%%%%%%%%%%%%%%%%%
             if algSet.algEnable(cao_c_rawIdx)
                 tStart = tic;
