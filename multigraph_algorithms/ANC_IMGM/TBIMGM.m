@@ -1,12 +1,16 @@
-function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, param)
-    global target
-    %%  single step of Incremental Multi Graph Matching
+function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, target, param)
+    %%  Adaptive Neighbourhood Construction for Incremental Multi-graph Matching(ANC_IMGM)
     graphCnt = param.N + 1;
+    nodeCnt = param.n;
+    X = rawMat(1:nodeCnt*graphCnt, 1:nodeCnt*graphCnt);
+    numPairMatch = 0;
+    if graphCnt <= 2 
+        return
+    end
     MST = zeros(graphCnt, 'logical');
     % find MST
-    
     MST(1:param.N, 1:param.N) = Prim(affScore(1:param.N, 1:param.N));
-    nodeCnt = param.n; % # of keypoints per graph
+    % # of keypoints per graph
     % initialize hyper graph
     isCenter = sum(MST) > 1;
     %% match members of all center
@@ -21,10 +25,6 @@ function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, param)
     %% connect new graph with best match
     MST(bestMatch, graphCnt) = 1;
     MST(graphCnt, bestMatch) = 1;
-    X = rawMat;
-    if graphCnt <= 2
-        return;
-    end
     if param.bVerbose
         fprintf('got best match with %d\n', bestMatch);
         fprintf('before improvment, match score = %.3f\n', affScore(graphCnt, bestMatch));
@@ -56,9 +56,9 @@ function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, param)
         affinityCrop = crop_affinity(included', affinity);
         %%%%%%%%%%%%%%%% crop the target %%%%%%%%%%%%%%%%%%%%%%%
         targetCrop = crop_target(included', target);
-
-%         X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom * 0.9,affinityCrop,targetCrop,method.optType,method.useCstInlier);
-        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,affinityCrop,targetCrop,method.optType,method.useCstInlier);
+        affScoreCurrent = affScore(included',included');
+        scrDenom = max(max(affScoreCurrent(1:end,1:end)));
+        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included), method.iterMax, scrDenom, affinityCrop,targetCrop,method.optType,method.useCstInlier);
 %         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
 %         pointFeat = affinity.pointFeat(included);
@@ -74,29 +74,6 @@ function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, param)
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
-
-    %% make consistent
-
-    
-    % r = graphCnt;
-    % rview = (r-1)*nodeCnt+1:r*nodeCnt;
-    % for x = included(1:end-1)
-    %     % if x == r
-    %     %     continue;
-    %     % end
-    %     xview = (x-1)*nodeCnt+1:x*nodeCnt;
-    %     for y = excluded
-    %         yview = (y-1)*nodeCnt+1:y*nodeCnt;
-    %         Xry = X(rview, xview)*X(xview, yview);
-    %         Sry = mat2vec(Xry)'*(affinity.K{r, y}*mat2vec(Xry));
-    %         if Sry > affScore(r, y)
-    %             X(rview, yview) = Xry;
-    %             X(yview, rview) = Xry';
-    %             affScore(r, y) = Sry;
-    %             affScore(y, r) = Sry;
-    %         end
-    %     end
-    % end
 
     stk = zeros(1, graphCnt);
     consistent = MST;

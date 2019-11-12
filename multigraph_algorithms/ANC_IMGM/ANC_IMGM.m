@@ -56,7 +56,9 @@ function [X, numPairMatch] = ANC_IMGM(affinity, affScore, rawMat, target, param)
         affinityCrop = crop_affinity(included', affinity);
         %%%%%%%%%%%%%%%% crop the target %%%%%%%%%%%%%%%%%%%%%%%
         targetCrop = crop_target(included', target);
-        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,affinityCrop,targetCrop,method.optType,method.useCstInlier);
+        affScoreCurrent = affScore(included',included');
+        scrDenom = max(max(affScoreCurrent(1:end,1:end)));
+        X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included), method.iterMax, scrDenom, affinityCrop,targetCrop,method.optType,method.useCstInlier);
 %         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
 %         pointFeat = affinity.pointFeat(included);
