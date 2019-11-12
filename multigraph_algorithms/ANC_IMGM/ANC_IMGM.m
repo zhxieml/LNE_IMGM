@@ -1,12 +1,16 @@
-function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
-    %%  single step of Incremental Multi Graph Matching
-    global target
-    graphCnt = param.N + param.graphStep;
+function [X, numPairMatch] = ANC_IMGM(affinity, affScore, rawMat, target, param)
+    %%  Adaptive Neighbourhood Construction for Incremental Multi-graph Matching(ANC_IMGM)
+    graphCnt = param.N + 1;
+    nodeCnt = param.n;
+    X = rawMat(1:nodeCnt*graphCnt, 1:nodeCnt*graphCnt);
+    numPairMatch = 0;
+    if graphCnt <= 2 
+        return
+    end
     MST = zeros(graphCnt, 'logical');
     % find MST
-    
     MST(1:param.N, 1:param.N) = Prim(affScore(1:param.N, 1:param.N));
-    nodeCnt = param.n; % # of keypoints per graph
+    % # of keypoints per graph
     % initialize hyper graph
     isCenter = sum(MST) > 1;
     %% match members of all center
@@ -21,10 +25,6 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     %% connect new graph with best match
     MST(bestMatch, graphCnt) = 1;
     MST(graphCnt, bestMatch) = 1;
-    X = rawMat;
-    if graphCnt <= 2
-        return;
-    end
     if param.bVerbose
         fprintf('got best match with %d\n', bestMatch);
         fprintf('before improvment, match score = %.3f\n', affScore(graphCnt, bestMatch));
@@ -53,14 +53,13 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     switch method.name
     case 'CAO'
         %%%%%%%%%%%%%%%% crop the affinity %%%%%%%%%%%%%%%%%%%%%
-        affinityCrop = crop_affinity(included', globalVar);
+        affinityCrop = crop_affinity(included', affinity);
         %%%%%%%%%%%%%%%% crop the target %%%%%%%%%%%%%%%%%%%%%%%
         targetCrop = crop_target(included', target);
-        
         X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,affinityCrop,targetCrop,method.optType,method.useCstInlier);
 %         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);
     case 'quickmatch'
-%         pointFeat = globalVar.pointFeat(included);
+%         pointFeat = affinity.pointFeat(included);
 %         X(subIndies, subIndies) = quickmatch(pointFeat, nodeCnt, method);
         nFeature = ones(1, length(included)) * nodeCnt;
         M_out = QuickMatch(rawMat(subIndies, subIndies), nFeature);
@@ -73,29 +72,6 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
-
-    %% make consistent
-
-    
-    % r = graphCnt;
-    % rview = (r-1)*nodeCnt+1:r*nodeCnt;
-    % for x = included(1:end-1)
-    %     % if x == r
-    %     %     continue;
-    %     % end
-    %     xview = (x-1)*nodeCnt+1:x*nodeCnt;
-    %     for y = excluded
-    %         yview = (y-1)*nodeCnt+1:y*nodeCnt;
-    %         Xry = X(rview, xview)*X(xview, yview);
-    %         Sry = mat2vec(Xry)'*(globalVar.K{r, y}*mat2vec(Xry));
-    %         if Sry > affScore(r, y)
-    %             X(rview, yview) = Xry;
-    %             X(yview, rview) = Xry';
-    %             affScore(r, y) = Sry;
-    %             affScore(y, r) = Sry;
-    %         end
-    %     end
-    % end
 
     stk = zeros(1, graphCnt);
     consistent = MST;
@@ -117,7 +93,7 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
                 view_t = (t-1)*nodeCnt+1:t*nodeCnt;
                 view_f = (f-1)*nodeCnt+1:f*nodeCnt;
                 Xrf = X(view_r, view_t)*X(view_t, view_f);
-                Srf = mat2vec(Xrf)'*(globalVar.K{r, f}*mat2vec(Xrf));
+                Srf = mat2vec(Xrf)'*(affinity.K{r, f}*mat2vec(Xrf));
                 if Srf > affScore(r, f) 
                     X(view_r, view_f) = Xrf;
                     X(view_f, view_r) = Xrf';
@@ -142,7 +118,7 @@ function [X, numPairMatch] = TBIMGM(globalVar, affScore, rawMat, param)
         view_b = (b-1)*nodeCnt+1:b*nodeCnt;
         view_c = (c-1)*nodeCnt+1:c*nodeCnt;
         Xab = X(view_a, view_c)*X(view_c, view_b);
-        Sab = mat2vec(Xab)'*(globalVar.K{a, b}*mat2vec(Xab));
+        Sab = mat2vec(Xab)'*(affinity.K{a, b}*mat2vec(Xab));
         if Sab > affScore(a, b)
             X(view_a, view_b) = Xab;
             X(view_b, view_a) = Xab';
