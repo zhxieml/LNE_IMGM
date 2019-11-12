@@ -11,7 +11,7 @@ target.config.graphMaxCnt=50;
 target.config.testCnt = 20; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 4;
-batchSize = 4;
+
 target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
@@ -37,6 +37,7 @@ algSet.algMarker = {'.','.','.','.','.','.', '.','.','.', '.', '.', '.', '.'};
 [~,tbimgm_cao_cadaIdx] = ismember('tbimgm_cao_c_ada', algSet.algNameSet);
 
 baseGraphCnt = target.config.graphMinCnt;
+batchSize = target.config.batchSize;
 target.config.graphRange = baseGraphCnt:batchSize:target.config.graphMaxCnt-batchSize;
 target.config.baseGraphCnt = baseGraphCnt;
 nInlier = target.config.nInlier;
