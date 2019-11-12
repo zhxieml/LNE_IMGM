@@ -6,9 +6,9 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=19; 
-target.config.graphMaxCnt=50; 
-target.config.testCnt = 20;% v
+target.config.graphMinCnt=2; 
+target.config.graphMaxCnt=5; 
+target.config.testCnt = 1;% v
 target.config.maxNumSearch = 20;
 graphStep = 1;
 target.config.database = "synthetic"; % "willow", "synthetic"
@@ -145,6 +145,7 @@ for testk = 1:testCnt
         %%%%%%%%%%%% calculate the incremental matching with cao_pc_raw %%%%%%%%%%%%%%%%%%%%%
         if algSet.algEnable(cao_pc_rawIdx)
             tStart = tic;
+
             increMatching{cao_pc_rawIdx} = CAO(rawMat(1:nodeCnt*(param.N+graphStep),1:nodeCnt*(param.N+graphStep)), nodeCnt, param.N+graphStep, target.config.iterRange, scrDenomCurrent, 'pair', 1);
             tEnd = toc(tStart);
             
