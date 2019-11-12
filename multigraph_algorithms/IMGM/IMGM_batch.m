@@ -8,7 +8,6 @@ function [P, numPairMatch] = IMGM_batch(affinity, target, rawMat, nodeCnt, baseG
     assert(size(rawMat, 1) == nodeCnt*(baseGraphCnt+batchSize), "error in IMGM_batch\n");
 
     param.n = nodeCnt;
-    aptOrder = 1:batchSize;
     graphCnt = size(rawMat, 1) / nodeCnt;
     batchSize = min(batchSize, graphCnt - baseGraphCnt);
     numPairMatch = 0;
@@ -42,7 +41,7 @@ function [P, numPairMatch] = IMGM_batch(affinity, target, rawMat, nodeCnt, baseG
             matTmp(1:nodeCnt*param.N,1:nodeCnt*param.N)=prevMatching;
         end
         affScore = cal_pair_graph_inlier_score_local(affinityReOrder, matTmp, nodeCnt, increCnt, nodeCnt);
-        param.subMethodParam.scrDenom = max(max(affScore(1:param.N,1:param.N)));
+                 % cal_pair_graph_inlier_score_local(affinity, X, nodeCnt, graphCnt, inCnt)
         increMatching = IMGM_local(affinityReOrder, affScore, matTmp, targetReOrder, param);
         %  IMGM_local(affinity, affScore, rawMat, target, param)
         numPairMatch = numPairMatch + increCnt;
@@ -53,7 +52,6 @@ function [P, numPairMatch] = IMGM_batch(affinity, target, rawMat, nodeCnt, baseG
     if useAptOrder && batchSize > 1
         [~, rcvrOrder] = sort(aptOrder, 'ascend');
         P = crop_rawMat(rcvrOrder, increMatching, nodeCnt);
-        numPairMatch = numPairMatch + batchSize^2;
     else
         P = increMatching;
     end

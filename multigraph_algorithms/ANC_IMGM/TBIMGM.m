@@ -53,10 +53,10 @@ function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, target, param)
     switch method.name
     case 'CAO'
         %%%%%%%%%%%%%%%% crop the affinity %%%%%%%%%%%%%%%%%%%%%
-        affinityCrop = crop_affinity(included', affinity);
+        affinityCrop = crop_affinity(included, affinity);
         %%%%%%%%%%%%%%%% crop the target %%%%%%%%%%%%%%%%%%%%%%%
-        targetCrop = crop_target(included', target);
-        affScoreCurrent = affScore(included',included');
+        targetCrop = crop_target(included, target);
+        affScoreCurrent = affScore(included,included);
         scrDenom = max(max(affScoreCurrent(1:end,1:end)));
         X(subIndies, subIndies) = CAO_local(rawMat(subIndies, subIndies),nodeCnt,length(included), method.iterMax, scrDenom, affinityCrop,targetCrop,method.optType,method.useCstInlier);
 %         X(subIndies, subIndies) = CAO(rawMat(subIndies, subIndies),nodeCnt,length(included),method.iterMax,method.scrDenom,method.optType,method.useCstInlier);

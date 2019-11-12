@@ -6,12 +6,12 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=2; 
-target.config.graphMaxCnt=5; 
-target.config.testCnt = 1;% v
+target.config.graphMinCnt=19; 
+target.config.graphMaxCnt=40; 
+target.config.testCnt = 20;% v
 target.config.maxNumSearch = 20;
 graphStep = 1;
-target.config.database = "synthetic"; % "willow", "synthetic"
+target.config.database = "willow"; % "willow", "synthetic"
 load_target_data;
 
 % set algorithms

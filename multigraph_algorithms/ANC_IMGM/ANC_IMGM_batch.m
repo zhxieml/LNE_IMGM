@@ -8,7 +8,6 @@ function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, b
     assert(size(rawMat, 1) == nodeCnt*(baseGraphCnt+batchSize), "error in IMGM_batch\n");
 
     param.n = nodeCnt;
-    aptOrder = 1:batchSize;
     graphCnt = size(rawMat, 1) / nodeCnt;
     batchSize = min(batchSize, graphCnt - baseGraphCnt);
     numPairMatch = 0;
@@ -53,7 +52,6 @@ function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, b
     if useAptOrder && batchSize > 1
         [~, rcvrOrder] = sort(aptOrder, 'ascend');
         P = crop_rawMat(rcvrOrder, increMatching, nodeCnt);
-        numPairMatch = numPairMatch + batchSize^2;
     else
         P = increMatching;
     end
