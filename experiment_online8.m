@@ -6,18 +6,19 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=20; 
-target.config.graphMaxCnt=52; 
-target.config.testCnt = 1; % v
+target.config.graphMinCnt=18; 
+target.config.graphMaxCnt=50; 
+target.config.testCnt = 20; % v
 target.config.maxNumSearch = 20;
-batchSize = 1;
+target.config.batchSize = 4;
+batchSize = 4;
 target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
 % set algorithms
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw', 'cao_c_inc','cao_c_raw','imgm_d','imgm_r','tbimgm_cao_c','tbimgm_cao_pc','tbimgm_cao_cst', 'tbimgm_qm', 'tbimgm_matchALS', 'tbimgm_cao_c_ada'};
-algSet.algEnable =  [ 0,            0,             0,           0,          1,       0,       1,              0,              0,               0,             0,             1];
+algSet.algEnable =  [ 1,            1,             0,           0,          1,       0,       0,              0,              0,               0,             0,             1];
 algSet.algColor = { cao_pcClr, cao_pc_rawClr, cao_cClr,cao_c_rawClr,imgm_dClr,imgm_rClr, tbimgm_cao_cClr, tbimgm_cao_pcClr, tbimgm_cao_cstClr, tbimgm_qmClr, tbimgm_matchALSClr, tbimgm_cao_c_adaClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-', '--', '-', '--', '-'};
 algSet.algMarker = {'.','.','.','.','.','.', '.','.','.', '.', '.', '.', '.'};
@@ -580,7 +581,7 @@ for parak=1:paraCnt
 end
 
 legendOff = 0;
-savePath = sprintf('exp_online_%s_%s.mat', target.config.database, target.config.category);
+savePath = sprintf('exp_online_%s_%s_batch_%d.mat', target.config.database, target.config.category, target.config.batchSize);
 save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
 ave.accuracy = accAveFull;
 ave.score = scrAveFull;
