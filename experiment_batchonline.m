@@ -8,7 +8,7 @@ setObsoleteVariables;
 
 target.config.graphMinCnt=20; 
 target.config.graphMaxCnt=52; 
-target.config.testCnt = 50; % v
+target.config.testCnt = 10; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 1;
 
@@ -171,7 +171,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_a4Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_a4Idx} = crop_rawMat(aptOrder{anc_imgm_a4Idx}, rawMat, nodeCnt);
@@ -210,7 +211,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_a8Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_a8Idx} = crop_rawMat(aptOrder{anc_imgm_a8Idx}, rawMat, nodeCnt);
@@ -249,7 +251,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_a16Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_a16Idx} = crop_rawMat(aptOrder{anc_imgm_a16Idx}, rawMat, nodeCnt);
@@ -289,7 +292,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'a');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_a32Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_a32Idx} = crop_rawMat(aptOrder{anc_imgm_a32Idx}, rawMat, nodeCnt);
@@ -328,7 +332,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_d4Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_d4Idx} = crop_rawMat(aptOrder{anc_imgm_d4Idx}, rawMat, nodeCnt);
@@ -367,7 +372,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_d8Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_d8Idx} = crop_rawMat(aptOrder{anc_imgm_d8Idx}, rawMat, nodeCnt);
@@ -406,7 +412,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_d16Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_d16Idx} = crop_rawMat(aptOrder{anc_imgm_d16Idx}, rawMat, nodeCnt);
@@ -445,7 +452,8 @@ for testk = 1:testCnt
                     upCnt = batchSize;
                 end
                 dimN = param.N*nodeCnt+1 : (param.N+upCnt)*nodeCnt;
-                subOrder = cal_adaptive_graph_order(rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
+                rawAffinity = crop_affinity(param.N+1:param.N+upCnt, affinity);
+                subOrder = cal_adaptive_graph_order(rawAffinity, rawMat(dimN, dimN), nodeCnt, upCnt, 'd');
                 subOrder = subOrder + param.N;
                 aptOrder{anc_imgm_d32Idx}(param.N+1:param.N+upCnt) = subOrder;
                 rawMatReOrder{anc_imgm_d32Idx} = crop_rawMat(aptOrder{anc_imgm_d32Idx}, rawMat, nodeCnt);
