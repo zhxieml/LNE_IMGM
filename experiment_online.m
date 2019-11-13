@@ -6,7 +6,7 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=20; 
+target.config.graphMinCnt=0; 
 target.config.graphMaxCnt=50; 
 target.config.testCnt = 1; % v
 target.config.maxNumSearch = 20;
@@ -18,7 +18,7 @@ load_target_data;
 % set algorithms
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw', 'cao_c_inc','cao_c_raw','imgm_d','imgm_r','tbimgm_cao_c','tbimgm_cao_pc','tbimgm_cao_cst', 'tbimgm_qm', 'tbimgm_matchALS', 'tbimgm_cao_c_ada'};
-algSet.algEnable =  [ 0,            0,             1,           1,          1,       1,       1,              0,              0,               0,             0,             1];
+algSet.algEnable =  [ 0,            0,             0,           0,          1,       1,       1,              0,              0,               0,             0,             1];
 algSet.algColor = { cao_pcClr, cao_pc_rawClr, cao_cClr,cao_c_rawClr,imgm_dClr,imgm_rClr, tbimgm_cao_cClr, tbimgm_cao_pcClr, tbimgm_cao_cstClr, tbimgm_qmClr, tbimgm_matchALSClr, tbimgm_cao_c_adaClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-', '--', '-', '--', '-'};
 algSet.algMarker = {'.','.','.','.','.','.', '.','.','.', '.', '.', '.', '.'};
