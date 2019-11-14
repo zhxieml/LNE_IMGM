@@ -1,4 +1,5 @@
-load('exp_online_synthetic_deform.mat');
+load('exp_partition_synthetic_deform.mat');
+init_path;
 graphRange = target.config.graphRange;
 baseGraphCnt = target.config.baseGraphCnt;
 ave.accuracy = accAveFull;

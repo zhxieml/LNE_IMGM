@@ -8,16 +8,16 @@ setObsoleteVariables;
 
 target.config.graphMinCnt=20; 
 target.config.graphMaxCnt=40; 
-target.config.testCnt = 20;% v
+target.config.testCnt = 10;% v
 target.config.partitionRange = 10:5:30;
 batchSize = 1;
-target.config.database = "synthetic"; % "willow", "synthetic"
+target.config.database = "willow"; % "willow", "synthetic"
 load_target_data;
 
 % set algorithms
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw', 'cao_c_inc','cao_c_raw','imgm_d','imgm_r','tbimgm_cao_c','tbimgm_cao_pc','tbimgm_cao_cst', 'tbimgm_qm', 'tbimgm_matchALS'};
-algSet.algEnable =  [ 0,            0,             0,           0,          1,       0,       1,              0,              0,               0,             0];
+algSet.algEnable =  [ 0,            0,             0,           0,          0,       0,       1,              0,              0,               0,             0];
 algSet.algColor = { cao_pcClr, cao_pc_rawClr, cao_cClr,cao_c_rawClr,imgm_dClr,imgm_rClr, tbimgm_cao_cClr, tbimgm_cao_pcClr, tbimgm_cao_cstClr, tbimgm_qmClr, tbimgm_matchALSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-', '--', '-', '--'};
 algSet.algMarker = {'.','.','.','.','.','.','.','.','.', '.', '.', '.'};
@@ -321,7 +321,7 @@ for testk = 1:testCnt
                 param.subMethodParam.scrDenom = max(max(scrDenomMatInCntTmp(1:param.N,1:param.N)));
 
                 tStart = tic;
-                [increMatching{tbimgm_cao_cIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_cao_cIdx}, param);
+                [increMatching{tbimgm_cao_cIdx}, numPairMatch] = ANC_IMGM(affinity, simAP, matTmp{tbimgm_cao_cIdx}, target, param);
                 tEnd = toc(tStart);
                 prevMatching{tbimgm_cao_cIdx} = increMatching{tbimgm_cao_cIdx};
                 
