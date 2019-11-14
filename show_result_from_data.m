@@ -1,4 +1,4 @@
-load('exp_online_synthetic_deform.mat');
+load('exp_online_willow_outlier_batch_1.mat');
 graphRange = target.config.graphRange;
 baseGraphCnt = target.config.baseGraphCnt;
 ave.accuracy = accAveFull;
