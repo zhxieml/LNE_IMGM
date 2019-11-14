@@ -20,18 +20,19 @@ batchSize = target.config.batchSize;
 
 graphCntRange = graphMinCnt:batchSize:graphMaxCnt;
 % graphStep = 1;
-target.config.database = "willow"; % "willow", "synthetic", "CMU-sequence"
+target.config.database = "synthetic"; % "willow", "synthetic", "CMU-sequence"
 load_target_data;
-% savePath = sprintf('./exp/exp_offline_%s_%s.mat', target.config.database, target.config.category);
-savePath = sprintf('./exp/exp_offline_%s_%s_%s.mat', target.config.database, target.config.class, target.config.category);
+
+savePath = sprintf('./exp/exp_offline_%s_%s_32aff.mat', target.config.database, target.config.category);
+% savePath = sprintf('./exp/exp_offline_%s_%s_%s32aff.mat', target.config.database, target.config.class, target.config.category);
 
 % set algorithms
 algNameSepSpace = '                    ';
-algSet.algNameSet = {'cao_c_raw','imgm_d','imgm_r','anc_imgm','anc_imgm_a16','anc_imgm_d16'};
-algSet.algEnable =  [     1,        1,       1,         1,          1,              1];
-algSet.algColor = { cao_c_rawClr,imgm_dClr,imgm_rClr,anc_imgmClr,anc_imgmaClr16,anc_imgmdClr16};
-algSet.algLineStyle = {'-',        '--',      '--'      '-.'        '-.'            '-.'};
-algSet.algMarker = {   '.',        '.',       '.',       '.',        '.',            '.'};
+algSet.algNameSet = {'cao_c_raw','imgm_d','imgm_r','anc_imgm','anc_imgm_a16','anc_imgm_d16', 'anc_imgm_a32','anc_imgm_d32'};
+algSet.algEnable =  [     0,        0,       0,         0,          0,              0,             1,              1];
+algSet.algColor = { cao_c_rawClr,imgm_dClr,imgm_rClr,anc_imgmClr,anc_imgmaClr16,anc_imgmdClr16, anc_imgmaClr16,anc_imgmdClr16};
+algSet.algLineStyle = {'-',        '--',      '--',      '-.',        '-.',            '-.',          '-.'            '-.'};
+algSet.algMarker = {   '.',        '.',       '.',       '.',        '.',            '.',              '.',            '.'};
 
 
 [~,cao_c_rawIdx] = ismember('cao_c_raw',algSet.algNameSet);
@@ -40,7 +41,8 @@ algSet.algMarker = {   '.',        '.',       '.',       '.',        '.',       
 [~,anc_imgmIdx] = ismember('anc_imgm',algSet.algNameSet);
 [~,anc_imgm_a16Idx] = ismember('anc_imgm_a16',algSet.algNameSet);
 [~,anc_imgm_d16Idx] = ismember('anc_imgm_d16',algSet.algNameSet);
-
+[~,anc_imgm_a32Idx] = ismember('anc_imgm_a32',algSet.algNameSet);
+[~,anc_imgm_d32Idx] = ismember('anc_imgm_d32',algSet.algNameSet);
 
 % baseGraphCnt = target.config.graphMinCnt;
 % target.config.graphRange = baseGraphCnt:graphStep:target.config.graphMaxCnt-graphStep;
@@ -228,7 +230,7 @@ for parak = 1:paraCnt
             param.maxNumSearch = target.config.maxNumSearch;
             
             tStart = tic;
-            [Matching{anc_imgm_a16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,batchSize,1,'a',param);
+            [Matching{anc_imgm_a16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'a',param);
             tEnd = toc(tStart);
             
             acc{anc_imgm_a16Idx} = cal_pair_graph_accuracy(Matching{anc_imgm_a16Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
@@ -257,7 +259,7 @@ for parak = 1:paraCnt
             
             tStart = tic;
 %             [P, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,batchSize,useAptOrder, param)
-            [Matching{anc_imgm_d16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,batchSize,1,'d',param);
+            [Matching{anc_imgm_d16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'d',param);
             tEnd = toc(tStart);
             
             acc{anc_imgm_d16Idx} = cal_pair_graph_accuracy(Matching{anc_imgm_d16Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
@@ -268,6 +270,63 @@ for parak = 1:paraCnt
             conPairAve(parak, anc_imgm_d16Idx, testk) = mean(con{anc_imgm_d16Idx}(:));
             timAve(parak, anc_imgm_d16Idx, testk) = tEnd;
             countPairAve(parak, anc_imgm_d16Idx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with anc_imgm_a32 %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(anc_imgm_a32Idx)
+            % param for tbimgm_cao_cIdx
+            param.subMethodParam.name = 'CAO';
+%             param.subMethodParam.useCstDecay = 1;
+%             param.subMethodParam.cstDecay  = 0.7;
+%             param.subMethodParam.useWeightedDecay  = 0;
+            param.subMethodParam.iterMax = target.config.iterRange;
+%             param.subMethodParam.scrDenom = scrDenomCurrent;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+            [Matching{anc_imgm_a32Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'a',param);
+            tEnd = toc(tStart);
+            
+            acc{anc_imgm_a32Idx} = cal_pair_graph_accuracy(Matching{anc_imgm_a32Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{anc_imgm_a32Idx} = cal_pair_graph_score(Matching{anc_imgm_a32Idx},affinity.GT,nodeCnt,graphCnt);
+            con{anc_imgm_a32Idx} = cal_pair_graph_consistency(Matching{anc_imgm_a32Idx},nodeCnt,graphCnt,0);
+            accAve(parak, anc_imgm_a32Idx, testk) = mean(acc{anc_imgm_a32Idx}(:));
+            scrAve(parak, anc_imgm_a32Idx, testk) = mean(scr{anc_imgm_a32Idx}(:));
+            conPairAve(parak, anc_imgm_a32Idx, testk) = mean(con{anc_imgm_a32Idx}(:));
+            timAve(parak, anc_imgm_a32Idx, testk) = tEnd;
+            countPairAve(parak, anc_imgm_a32Idx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with anc_imgm_d16 %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(anc_imgm_d32Idx)
+            % param for tbimgm_cao_cIdx
+            param.subMethodParam.name = 'CAO';
+%             param.subMethodParam.useCstDecay = 1;
+%             param.subMethodParam.cstDecay  = 0.7;
+%             param.subMethodParam.useWeightedDecay  = 0;
+            param.subMethodParam.iterMax = target.config.iterRange;
+%             param.subMethodParam.scrDenom = scrDenomCurrent;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+%             [P, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,batchSize,useAptOrder, param)
+            [Matching{anc_imgm_d32Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'d',param);
+            tEnd = toc(tStart);
+            
+            acc{anc_imgm_d32Idx} = cal_pair_graph_accuracy(Matching{anc_imgm_d32Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{anc_imgm_d32Idx} = cal_pair_graph_score(Matching{anc_imgm_d32Idx},affinity.GT,nodeCnt,graphCnt);
+            con{anc_imgm_d32Idx} = cal_pair_graph_consistency(Matching{anc_imgm_d32Idx},nodeCnt,graphCnt,0);
+            accAve(parak, anc_imgm_d32Idx, testk) = mean(acc{anc_imgm_d32Idx}(:));
+            scrAve(parak, anc_imgm_d32Idx, testk) = mean(scr{anc_imgm_d32Idx}(:));
+            conPairAve(parak, anc_imgm_d32Idx, testk) = mean(con{anc_imgm_d32Idx}(:));
+            timAve(parak, anc_imgm_d32Idx, testk) = tEnd;
+            countPairAve(parak, anc_imgm_d32Idx, testk) = numPairMatch;
         end
         
         fprintf('%d graphs, test in round %d/%d\n', graphCnt, testk, testCnt);

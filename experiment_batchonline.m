@@ -8,10 +8,9 @@ setObsoleteVariables;
 
 target.config.graphMinCnt=0; 
 target.config.graphMaxCnt=52; 
-target.config.testCnt = 10; % v
+target.config.testCnt = 50; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 1;
-
 target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
