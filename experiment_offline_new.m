@@ -8,12 +8,12 @@ setObsoleteVariables;
 
 % target.config.graphMinCnt=19; 
 % target.config.graphMaxCnt=50; 
-target.config.testCnt = 20;% v
+target.config.testCnt = 40;% v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 4;
 
 target.config.graphMinCnt=16; 
-target.config.graphMaxCnt=32; 
+target.config.graphMaxCnt=16; 
 graphMaxCnt = target.config.graphMaxCnt;
 graphMinCnt = target.config.graphMinCnt;
 batchSize = target.config.batchSize;
