@@ -15,7 +15,7 @@ function [P, numPairMatch] = IMGM_batch(affinity, target, rawMat, nodeCnt, baseG
     if useAptOrder && batchSize > 1
         % calculate adaptive order 
         dimN = baseGraphCnt*nodeCnt + 1: (baseGraphCnt+batchSize)*nodeCnt;
-        aptOrder = cal_adaptive_graph_order(rawMat(dimN, dimN),nodeCnt,batchSize);
+        aptOrder = cal_adaptive_graph_order(rawMat(dimN, dimN),nodeCnt,batchSize, 'd');
         aptOrder = aptOrder + baseGraphCnt;
         aptOrder = [1:baseGraphCnt, aptOrder']; % length(aptOrder) = baseGraphCnt + batchSize
         % reorder rawMat, affinity and target
@@ -74,8 +74,15 @@ function [P, numPairMatch] = IMGM_batch(affinity, target, rawMat, nodeCnt, baseG
     end
 
     % recover the order
+    opt = 'd';
     if useAptOrder && batchSize > 1
-        [~, rcvrOrder] = sort(aptOrder, 'ascend');
+        switch opt
+            case 'a'
+                [~, rcvrOrder] = sort(aptOrder, 'descend');
+            case 'd'
+                [~, rcvrOrder] = sort(aptOrder, 'ascend');
+        end
+%         [~, rcvrOrder] = sort(aptOrder, 'ascend');
         P = crop_rawMat(rcvrOrder, increMatching, nodeCnt);
     else
         P = increMatching;

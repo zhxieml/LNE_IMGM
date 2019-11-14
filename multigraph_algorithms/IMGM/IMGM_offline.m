@@ -7,9 +7,6 @@ function [P, numPairMatch] = IMGM_offline(rawMat,nodeCnt,graphCnt,param)
     graphStep = 1;
     paraCnt = (graphCnt - baseGraphCnt) / graphStep;
     
-    % # outliers = 0
-%     scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,nodeCnt);
-    
     prevMatching = rawMat(1:nodeCnt*baseGraphCnt, 1:nodeCnt*baseGraphCnt);
     
     param.n = nodeCnt;
