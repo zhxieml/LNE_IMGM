@@ -13,6 +13,7 @@ Sacle_2D = target.config.Sacle_2D;
 deform = target.config.deform;
 % baseGraphCnt = target.config.baseGraphCnt;
 % deform = linspace(0.1, 0.2, graphCnt-baseGraphCnt);
+% deform(randperm(graphCnt-baseGraphCnt)) = deform;
 % deform = [ones([1, baseGraphCnt]).*0.15, deform];
 density = target.config.density;
 nOutlier = target.config.nOutlier;

@@ -11,7 +11,7 @@ tbimgm_qmClr = [.85 .55 0];
 tbimgm_matchALSClr = 'm';
 tbimgm_cao_c_adaClr = 'm';
 
-
+tbimgm_cao_c_1Clr = [.85 .55 0];
 
 anc_imgmdClr32 = [0, 0.84, 1];
 anc_imgmdClr16 = [0, 0.55, 1];
@@ -23,5 +23,7 @@ anc_imgmaClr8 =  [1,0.27,0];
 anc_imgmaClr16 = [1,0.55,0];
 anc_imgmaClr32 = [1,0.84,0];
 
-
-
+imgm_rawClr = [0, 0, 1];
+imgm_caoClr = [0, 1, 1];
+anc_imgm_rawClr = [1, 0, 0];
+anc_imgm_caoClr = [1, 1, 0];

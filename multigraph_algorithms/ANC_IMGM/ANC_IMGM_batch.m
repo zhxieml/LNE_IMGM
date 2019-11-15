@@ -1,4 +1,4 @@
-function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, baseGraphCnt, batchSize, useAptOrder, param)
+function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, baseGraphCnt, batchSize, useAptOrder, opt, param)
     % batch version of ANC_IMGM
     % put multiple graphs at one time
     % calculate adaptive graph order to promote accuracy
@@ -15,7 +15,7 @@ function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, b
     if useAptOrder && batchSize > 1
         % calculate adaptive order 
         dimN = baseGraphCnt*nodeCnt + 1: (baseGraphCnt+batchSize)*nodeCnt;
-        aptOrder = cal_adaptive_graph_order(rawMat(dimN, dimN),nodeCnt,batchSize, 'a');
+        aptOrder = cal_adaptive_graph_order(rawMat(dimN, dimN),nodeCnt,batchSize, opt);
         aptOrder = aptOrder + baseGraphCnt;
         aptOrder = [1:baseGraphCnt, aptOrder']; % length(aptOrder) = baseGraphCnt + batchSize
         % reorder rawMat, affinity and target
@@ -50,7 +50,13 @@ function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, b
 
     % recover the order
     if useAptOrder && batchSize > 1
-        [~, rcvrOrder] = sort(aptOrder, 'ascend');
+        switch opt
+            case 'a'
+                [~, rcvrOrder] = sort(aptOrder, 'descend');
+            case 'd'
+                [~, rcvrOrder] = sort(aptOrder, 'ascend');
+        end
+%         [~, rcvrOrder] = sort(aptOrder, 'ascend');
         P = crop_rawMat(rcvrOrder, increMatching, nodeCnt);
     else
         P = increMatching;

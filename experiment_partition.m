@@ -8,7 +8,7 @@ setObsoleteVariables;
 
 target.config.graphMinCnt=20; 
 target.config.graphMaxCnt=40; 
-target.config.testCnt = 20;% v
+target.config.testCnt = 10;% v
 target.config.partitionRange = 10:5:30;
 batchSize = 1;
 target.config.database = "willow"; % "willow", "synthetic"
