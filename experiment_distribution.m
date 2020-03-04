@@ -6,13 +6,14 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=0; 
-target.config.graphMaxCnt=52; 
-target.config.testCnt = 20; % v
+target.config.graphMinCnt=20; 
+target.config.graphMaxCnt=50; 
+target.config.testCnt = 30; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 1;
-target.config.database = "synthetic"; % "willow", "synthetic"
+target.config.database = "willow"; % "willow", "synthetic"
 load_target_data;
+distribution = zeros(target.config.testCnt, 30, 10);
 
 % set algorithms
 algNameSepSpace = '                    ';
@@ -146,6 +147,12 @@ for testk = 1:testCnt
             prevMatching{anc_imgmIdx} = increMatching{anc_imgmIdx};
             
             acc{anc_imgmIdx} = cal_pair_graph_accuracy(increMatching{anc_imgmIdx},affinity.GT,target.config.nOutlier,nodeCnt,param.N+1);
+            
+            h = histogram(acc{anc_imgmIdx}, 10);
+            distribution(testk, parak, :) = h.Values / sum(h.Values);
+            disp(distribution(testk, parak, 10));
+
+            
             scr{anc_imgmIdx} = cal_pair_graph_score(increMatching{anc_imgmIdx},affinity.GT,nodeCnt,param.N+1);
             % scr{anc_imgmIdx} = cal_pair_graph_inlier_score(increMatching{anc_imgmIdx},affinity.GT,nodeCnt,param.N+batchSize, target.config.inCnt);
             con{anc_imgmIdx} = cal_pair_graph_consistency(increMatching{anc_imgmIdx},nodeCnt,param.N+1,0);
@@ -539,16 +546,18 @@ for parak=1:paraCnt
     fprintf('\n');fprintf(fidPerf,'\n');
 end
 
-legendOff = 0;
-savePath = sprintf('exp_batchonline_%s_%s.mat', target.config.database, target.config.category);
-save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
-ave.accuracy = accAveFull;
-ave.score = scrAveFull;
-ave.consistency = conPairAveFull;
-ave.time = timAveFull;
-ave.matchingNumber = countPairAveFull;
-fields = fieldnames(ave);
-for ifield = 1:length(fields)
-    xtag='Arriving graph';ytag=[fields{ifield}, '(',target.config.category,')'];
-    plotResult_new(legendOff,target.config.graphRange-baseGraphCnt+1, getfield(ave,fields{ifield}), algSet, xtag, ytag);
-end
+savePath = sprintf("distribution_%s_from%dto%d_%d.mat", target.config.class, target.config.graphMinCnt, target.config.graphMaxCnt, target.config.testCnt);
+save(savePath, 'distribution');
+% legendOff = 0;
+% savePath = sprintf('exp_batchonline_%s_%s.mat', target.config.database, target.config.category);
+% save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
+% ave.accuracy = accAveFull;
+% ave.score = scrAveFull;
+% ave.consistency = conPairAveFull;
+% ave.time = timAveFull;
+% ave.matchingNumber = countPairAveFull;
+% fields = fieldnames(ave);
+% for ifield = 1:length(fields)
+%     xtag='Arriving graph';ytag=[fields{ifield}, '(',target.config.category,')'];
+%     plotResult_new(legendOff,target.config.graphRange-baseGraphCnt+1, getfield(ave,fields{ifield}), algSet, xtag, ytag);
+% end

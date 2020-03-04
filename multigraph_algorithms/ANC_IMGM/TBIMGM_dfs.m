@@ -1,4 +1,4 @@
-function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, target, param)
+function [X, numPairMatch] = TBIMGM_dfs(affinity, affScore, rawMat, target, param)
     %%  Adaptive Neighbourhood Construction for Incremental Multi-graph Matching(ANC_IMGM)
     graphCnt = param.N + 1;
     nodeCnt = param.n;
@@ -32,8 +32,8 @@ function [X, numPairMatch] = TBIMGM(affinity, affScore, rawMat, target, param)
     
     %% apply multigraph algorithms to solve matches in included
     nSubSet = param.maxNumSearch;
-    % breadth first search to find nSubSet nearest graphs
-    isInSubSet = bfs(MST, graphCnt, nSubSet);
+    % depth first search to find nSubSet nearest graphs
+    isInSubSet = dfs(MST, graphCnt, nSubSet);
     if param.bVerbose
         nSearch = nnz(isInSubSet);
         fprintf("bfs find %d graphs\n", nSearch);

@@ -77,7 +77,10 @@ ylabel(ytag,'Fontsize',plotSet.labelFontSize,'FontName','Arial','FontWeight','bo
 if cate_config(end)<=cate_config(1)
     set(gca,'xtick',cate_config(end:-1:1));
 else
-    set(gca,'xtick',cate_config);
+    a = (cate_config(1)-1):5:cate_config(end);
+    a = [1, a(2:end)];
+    
+    set(gca,'Xtick',a);
 end
 if y1<1 && y2<=1.5
     ytickNum = floor(y1*10)/10:0.1:y2;

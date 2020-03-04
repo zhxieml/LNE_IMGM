@@ -1,4 +1,4 @@
-function Ku = dfs(K, X, MST, gama, subSet, iu, ir, nodeCnt)
+function Ku = DFS(K, X, MST, gama, subSet, iu, ir, nodeCnt)
 % depth first search on graph with depth < maxDepth
     len = length(subSet);
     Xu = zeros(nodeCnt, nodeCnt, len);
