@@ -1,4 +1,4 @@
-function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, param)
+function [X, numPairMatch] = ANC_IMGM_dfs(affinity, affScore, rawMat, target, param)
     %%  Adaptive Neighbourhood Construction for Incremental Multi-graph Matching(ANC_IMGM)
     graphCnt = param.N + 1;
     nodeCnt = param.n;
@@ -33,20 +33,22 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
     %% apply multigraph algorithms to solve matches in included
     nSubSet = param.maxNumSearch;
     % breadth first search to find nSubSet nearest graphs
-    isInSubSet = bfs(MST, graphCnt, nSubSet);
+    isInSubSet = dfs(MST, graphCnt, nSubSet);
     if param.bVerbose
         nSearch = nnz(isInSubSet);
         fprintf("bfs find %d graphs\n", nSearch);
     end
     
     % number of matches
-    numPairMatch = sum(isCenter | isConsidered | isInSubSet);
+    unpairmatch = isCenter | isConsidered | isInSubSet;
+    numPairMatch = sum(unpairmatch);
 
     included = find(isInSubSet);
     excluded = find(~isInSubSet);
     % pairwise match included
-    affScore(graphCnt, ~isInSubSet) = 0;
-    affScore(~isInSubSet, graphCnt) = 0;
+    
+    affScore(graphCnt, ~unpairmatch) = 0;
+    affScore(~unpairmatch, graphCnt) = 0;
     % apply multigraph algorithms
     method = param.subMethodParam;
     subIndies = getSubIndices(included, nodeCnt);
@@ -74,26 +76,20 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
-    
-    len = graphCnt + 1;
-    queue = zeros(1, len);
+
+    stk = zeros(1, graphCnt);
     consistent = MST;
-    
     for r = included
-        queue(:) = 0;
+        stk(:) = 0;
         visited = isInSubSet;
-        
-        front = 1;
-        tail = 2;
-        queue(front) = r;
-        
-        while front ~= tail
-            t = queue(front);
+        top = 1;
+        stk(top) = r;
+        while(top >= 1)
+            t = stk(top);
             visited(t) = true;
             notVisited = MST(t, :) & (~visited);
-            
             if (~nnz(notVisited))
-                front = mod(front, len) + 1;
+                top = top - 1;
             else
                 % t is the father point, f is the adjecent point
                 f = find(notVisited, 1);
@@ -111,49 +107,12 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
                 % update consistent
                 consistent(r, f) = 1;
                 consistent(f, r) = 1;
-                % update queue
-                queue(tail) = f;
-                tail = mod(tail, len) + 1;
+                % update stack
+                stk(top+1) = f;
+                top = top + 1;
             end
         end
     end
-
-%     stk = zeros(1, graphCnt);
-%     consistent = MST;
-%     for r = included
-%         stk(:) = 0;
-%         visited = isInSubSet;
-%         top = 1;
-%         stk(top) = r;
-%         while(top >= 1)
-%             t = stk(top);
-%             visited(t) = true;
-%             notVisited = MST(t, :) & (~visited);
-%             if (~nnz(notVisited))
-%                 top = top - 1;
-%             else
-%                 % t is the father point, f is the adjecent point
-%                 f = find(notVisited, 1);
-%                 view_r = (r-1)*nodeCnt+1:r*nodeCnt;
-%                 view_t = (t-1)*nodeCnt+1:t*nodeCnt;
-%                 view_f = (f-1)*nodeCnt+1:f*nodeCnt;
-%                 Xrf = X(view_r, view_t)*X(view_t, view_f);
-%                 Srf = mat2vec(Xrf)'*(affinity.K{r, f}*mat2vec(Xrf));
-%                 if Srf > affScore(r, f) 
-%                     X(view_r, view_f) = Xrf;
-%                     X(view_f, view_r) = Xrf';
-%                     affScore(r, f) = Srf;
-%                     affScore(f, r) = Srf;
-%                 end
-%                 % update consistent
-%                 consistent(r, f) = 1;
-%                 consistent(f, r) = 1;
-%                 % update stack
-%                 stk(top+1) = f;
-%                 top = top + 1;
-%             end
-%         end
-%     end
     [row, col] = find(~consistent(excluded, included));
     for ii = 1:length(row)
         a = excluded(row(ii));
@@ -173,3 +132,5 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
     end
 
 end
+
+

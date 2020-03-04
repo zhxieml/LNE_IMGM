@@ -1,4 +1,4 @@
-function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, param)
+function [X, numPairMatch] = ANC_IMGM_bfs(affinity, affScore, rawMat, target, param)
     %%  Adaptive Neighbourhood Construction for Incremental Multi-graph Matching(ANC_IMGM)
     graphCnt = param.N + 1;
     nodeCnt = param.n;
@@ -40,13 +40,15 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
     end
     
     % number of matches
-    numPairMatch = sum(isCenter | isConsidered | isInSubSet);
+    unpairmatch = isCenter | isConsidered | isInSubSet;
+    numPairMatch = sum(unpairmatch);
 
     included = find(isInSubSet);
     excluded = find(~isInSubSet);
     % pairwise match included
-    affScore(graphCnt, ~isInSubSet) = 0;
-    affScore(~isInSubSet, graphCnt) = 0;
+    
+    affScore(graphCnt, ~unpairmatch) = 0;
+    affScore(~unpairmatch, graphCnt) = 0;
     % apply multigraph algorithms
     method = param.subMethodParam;
     subIndies = getSubIndices(included, nodeCnt);
@@ -74,7 +76,7 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
-    
+
     len = graphCnt + 1;
     queue = zeros(1, len);
     consistent = MST;
@@ -117,7 +119,6 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
             end
         end
     end
-
 %     stk = zeros(1, graphCnt);
 %     consistent = MST;
 %     for r = included
@@ -173,3 +174,5 @@ function [X, numPairMatch] = TBIMGM_bfs(affinity, affScore, rawMat, target, para
     end
 
 end
+
+

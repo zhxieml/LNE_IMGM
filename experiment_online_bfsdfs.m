@@ -6,12 +6,12 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=2; 
-target.config.graphMaxCnt=40; 
+target.config.graphMinCnt=20; 
+target.config.graphMaxCnt=50; 
 target.config.testCnt = 10;% v
 target.config.maxNumSearch = 20;
 graphStep = 1;
-target.config.database = "willow"; % "willow", "synthetic"
+target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
 % set algorithms
@@ -267,7 +267,7 @@ for testk = 1:testCnt
                 numPairMatch = 0;
             else
                 tStart = tic;
-                [increMatching{tbimgm_cao_cIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_cao_cIdx}, target, param);
+                [increMatching{tbimgm_cao_cIdx}, numPairMatch] = ANC_IMGM(affinity, simAP, matTmp{tbimgm_cao_cIdx}, target, param);
                 tEnd = toc(tStart);
             end
             prevMatching{tbimgm_cao_cIdx} = increMatching{tbimgm_cao_cIdx};
@@ -319,7 +319,7 @@ for testk = 1:testCnt
                 numPairMatch = 0;
             else
                 tStart = tic;
-                [increMatching{tbimgm_cao_cDFSIdx}, numPairMatch] = TBIMGM_dfs(affinity, simAP, matTmp{tbimgm_cao_cDFSIdx}, target, param);
+                [increMatching{tbimgm_cao_cDFSIdx}, numPairMatch] = ANC_IMGM_dfs(affinity, simAP, matTmp{tbimgm_cao_cDFSIdx}, target, param);
                 tEnd = toc(tStart);
             end
             prevMatching{tbimgm_cao_cDFSIdx} = increMatching{tbimgm_cao_cDFSIdx};
@@ -369,7 +369,7 @@ for testk = 1:testCnt
                 numPairMatch = 0;
             else
                 tStart = tic;
-                [increMatching{tbimgm_cao_cBFSIdx}, numPairMatch] = TBIMGM_bfs(affinity, simAP, matTmp{tbimgm_cao_cBFSIdx}, target, param);
+                [increMatching{tbimgm_cao_cBFSIdx}, numPairMatch] = ANC_IMGM_bfs(affinity, simAP, matTmp{tbimgm_cao_cBFSIdx}, target, param);
                 tEnd = toc(tStart);
             end
             prevMatching{tbimgm_cao_cBFSIdx} = increMatching{tbimgm_cao_cBFSIdx};
