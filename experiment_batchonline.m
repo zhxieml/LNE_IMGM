@@ -6,7 +6,7 @@ setPlotColor;
 algpar = setPairwiseSolver();
 setObsoleteVariables;
 
-target.config.graphMinCnt=0; 
+target.config.graphMinCnt=20; 
 target.config.graphMaxCnt=52; 
 target.config.testCnt = 20; % v
 target.config.maxNumSearch = 20;

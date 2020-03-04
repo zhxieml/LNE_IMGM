@@ -42,7 +42,16 @@ function [P, numPairMatch] = ANC_IMGM_batch(affinity, target, rawMat, nodeCnt, b
         end
         affScore = cal_pair_graph_inlier_score_local(affinityReOrder, matTmp, nodeCnt, increCnt, nodeCnt);
         param.subMethodParam.scrDenom = max(max(affScore(1:param.N,1:param.N)));
-        [increMatching, numPairMatchSingle] = ANC_IMGM(affinityReOrder, affScore, matTmp, targetReOrder, param);
+        
+        if param.searchMethod == "bfs"
+            [increMatching, numPairMatchSingle] = ANC_IMGM_bfs(affinityReOrder, affScore, matTmp, targetReOrder, param);
+        elseif param.searchMethod == "dfs"
+            [increMatching, numPairMatchSingle] = ANC_IMGM_dfs(affinityReOrder, affScore, matTmp, targetReOrder, param);
+        else
+            [increMatching, numPairMatchSingle] = ANC_IMGM(affinityReOrder, affScore, matTmp, targetReOrder, param);
+        end
+            
+%         [increMatching, numPairMatchSingle] = ANC_IMGM(affinityReOrder, affScore, matTmp, targetReOrder, param);
         % TBIMGM(globalVar, affScore, rawMat, target, param)
         numPairMatch = numPairMatch + numPairMatchSingle;
         prevMatching = increMatching;
