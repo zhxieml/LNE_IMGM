@@ -321,7 +321,7 @@ for testk = 1:testCnt
                 param.subMethodParam.scrDenom = max(max(scrDenomMatInCntTmp(1:param.N,1:param.N)));
 
                 tStart = tic;
-                [increMatching{tbimgm_cao_cIdx}, numPairMatch] = ANC_IMGM(affinity, simAP, matTmp{tbimgm_cao_cIdx}, target, param);
+                [increMatching{tbimgm_cao_cIdx}, numPairMatch] = TBIMGM(affinity, simAP, matTmp{tbimgm_cao_cIdx}, target, param);
                 tEnd = toc(tStart);
                 prevMatching{tbimgm_cao_cIdx} = increMatching{tbimgm_cao_cIdx};
                 
@@ -560,7 +560,7 @@ for xk=1:xCnt
 end
 
 legendOff = 0;
-savePath = sprintf('exp_partition_%s_%s.mat', target.config.database, target.config.category);
+savePath = sprintf('exp_partition_Winebottle_%s_%s.mat', target.config.database, target.config.category);
 save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
 ave.accuracy = accAveFull;
 ave.score = scrAveFull;

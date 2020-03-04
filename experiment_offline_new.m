@@ -9,7 +9,7 @@ setObsoleteVariables;
 % target.config.graphMinCnt=19; 
 % target.config.graphMaxCnt=50; 
 target.config.testCnt = 20;% v
-target.config.maxNumSearch = 20;
+target.config.maxNumSearch = 18;
 target.config.batchSize = 4;
 
 target.config.graphMinCnt=4; 
@@ -20,7 +20,7 @@ batchSize = target.config.batchSize;
 
 graphCntRange = graphMinCnt:batchSize:graphMaxCnt;
 % graphStep = 1;
-target.config.database = "willow"; % "willow", "synthetic", "CMU-sequence"
+target.config.database = "synthetic"; % "willow", "synthetic", "CMU-sequence"
 load_target_data;
 
 i = 0;
