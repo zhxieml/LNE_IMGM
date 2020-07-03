@@ -13,13 +13,13 @@ target.config.testCnt = 20; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 1;
 
-target.config.database = "willow"; % "willow", "synthetic"
+target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
 % set algorithms
 algNameSepSpace = '                    ';
 algSet.algNameSet = {'cao_pc_inc', 'cao_pc_raw', 'cao_c_inc','cao_c_raw','imgm_d','imgm_r','tbimgm_cao_c', 'tbimgm_cao_c_ada', 'tbimgm_cao_cBFS', 'tbimgm_cao_cDFS'};
-algSet.algEnable =  [ 0,            0,             0,           0,          0,       0,       1,              0,                      1,                   1];
+algSet.algEnable =  [ 0,            0,             0,           0,          0,       0,       1,              0,                      0,                   1];
 algSet.algColor = { cao_pcClr, cao_pc_rawClr, cao_cClr,cao_c_rawClr,imgm_dClr,imgm_rClr, anc_imgmClr, tbimgm_cao_c_adaClr, tbimgm_cao_cBFSClr, tbimgm_cao_cDFSClr};
 algSet.algLineStyle = {'--','--','-','--','-','--','-','-','--','--'};
 algSet.algMarker = {'.','.','.','.','.','.', '.','.','.','.'};

@@ -76,6 +76,12 @@ function [X, numPairMatch] = ANC_IMGM_dfs(affinity, affScore, rawMat, target, pa
     otherwise
         error('Unexpected sub-multigraph-matching method\n');
     end
+    
+    G = graph(MST);
+    plot(G);
+    pause;
+    d = distances(G);
+    fprintf("DFS: %d\n", max(d(:)));
 
     stk = zeros(1, graphCnt);
     consistent = MST;
@@ -88,28 +94,27 @@ function [X, numPairMatch] = ANC_IMGM_dfs(affinity, affScore, rawMat, target, pa
             t = stk(top);
             visited(t) = true;
             notVisited = MST(t, :) & (~visited);
-            if (~nnz(notVisited))
-                top = top - 1;
-            else
+            top = top - 1;
+            
+            for ii = find(notVisited)
                 % t is the father point, f is the adjecent point
-                f = find(notVisited, 1);
                 view_r = (r-1)*nodeCnt+1:r*nodeCnt;
                 view_t = (t-1)*nodeCnt+1:t*nodeCnt;
-                view_f = (f-1)*nodeCnt+1:f*nodeCnt;
+                view_f = (ii-1)*nodeCnt+1:ii*nodeCnt;
                 Xrf = X(view_r, view_t)*X(view_t, view_f);
-                Srf = mat2vec(Xrf)'*(affinity.K{r, f}*mat2vec(Xrf));
-                if Srf > affScore(r, f) 
+                Srf = mat2vec(Xrf)'*(affinity.K{r, ii}*mat2vec(Xrf));
+                if Srf > affScore(r, ii) 
                     X(view_r, view_f) = Xrf;
                     X(view_f, view_r) = Xrf';
-                    affScore(r, f) = Srf;
-                    affScore(f, r) = Srf;
+                    affScore(r, ii) = Srf;
+                    affScore(ii, r) = Srf;
                 end
                 % update consistent
-                consistent(r, f) = 1;
-                consistent(f, r) = 1;
+                consistent(r, ii) = 1;
+                consistent(ii, r) = 1;
                 % update stack
-                stk(top+1) = f;
                 top = top + 1;
+                stk(top) = ii;
             end
         end
     end
