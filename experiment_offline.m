@@ -2,316 +2,356 @@
 clear *;clear -global *;close all;clc;
 global affinity target
 init_path;
-
 setPlotColor;
-setObsoleteVariables;% some old parameters are used for debug and other tests, less relevant to the algorithm
-% by default set to 0 for target.config.useCstInlier (affinity-driven), no use in formal test type, only useful in massiveOutlier mode 
-% target.config.useCstInlier = 0;% set to 1 if use consistency to mask inliers, otherwise use affinity metrics, see Sec 3.5 in PAMI paper
-% random graph test, note not the random point set test as used in mpm
-% testType: different modes for tests, e.g. formal (Fig.3&4), case(Fig.1), iter(Fig.2), massOutlier(Fig.5&6)
-% target.config.testType = 'formal';% for logic simplicity, this demo code involves only formal case for random graphs Fig.3, another is massOutlier.
-target.config.testType = 'formal';% massOutlier
 algpar = setPairwiseSolver();
-mpmAlgPar = setMPMAlgPar;
+setObsoleteVariables;
 
-varyMinGrhCnt=20; varyMaxGrhCnt=50; grhTestCnt = 10;% 
-target.config.database = 'synthetic';% only synthetic test is allowed here
-target.config.Sacle_2D = 0.05;
-iterRange = 6;
-graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-algNameSepSpace = '                    ';
-algSet.algNameSet = {'cao_pc','cao_pc_raw','imgm_d','imgm_r','tbimgm_cao','tbimgm_cao_pc','tbimgm_cao_uc','tbimgm_qm','tbimgm_matchALS', 'tbimgm_cao_pc_ordered'};
-algSet.algEnable =  [ 1,        0,           0,       0,          0,           1,              0,              0,            0,                     1];
-algSet.algColor = {imgm_rClr,imgm_rClr,imgm_dClr,imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr, imgm_rClr};
-algSet.algLineStyle = {'--','--','-','--','-','--','-','--','-'};
-algSet.algMarker = {'.','.','.','.','.','.','.','.','.'};
-target.config.bGraphMatch = 1;
-target.config.inCntType = 'all';% set 'all' for "only a few outlier case", e.g. Fig.1&2&3&4
-target.config.category = 'deform';%'deform','outlier','density','complete'
-switch target.config.category
-    case 'deform' % same setting with 5th row in Table 1 in the PAMI paper 
-        nInlier = 10;target.config.nOutlier = 0;target.config.deform = 0.15;
-        target.config.density = .9;target.config.complete = 1;
-        graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-    case 'outlier' % same setting with 6th row in Table 1 in the PAMI paper 
-        nInlier = 6;target.config.nOutlier = 4;target.config.deform = 0;
-        target.config.density = 1;target.config.complete = 1;
-        graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-    case 'density' % same setting with 7th row in Table 1 in the PAMI paper 
-        nInlier = 10;target.config.nOutlier = 0;target.config.deform = 0.0;
-        target.config.density = 0.5;target.config.complete = 1;
-        graphMinCnt = varyMinGrhCnt;graphMaxCnt = varyMaxGrhCnt;testCnt = grhTestCnt;
-    case 'complete' % same setting with 8th row in Table 1 in the PAMI paper 
-        nInlier = 10;target.config.nOutlier = 0;target.config.deform = 0.05;
-        target.config.density = 1;target.config.complete = 0.1;     
+target.config.testCnt = 1;% v
+target.config.maxNumSearch = 20;
+target.config.batchSize = 4;
+target.config.graphMinCnt=16; 
+target.config.graphMaxCnt=32; 
+graphMaxCnt = target.config.graphMaxCnt;
+graphMinCnt = target.config.graphMinCnt;
+batchSize = target.config.batchSize;
+
+graphCntRange = graphMinCnt:batchSize:graphMaxCnt;
+target.config.database = 'willow'; % 'willow', 'synthetic'
+load_target_data;
+
+if strcmp(target.config.database, 'synthetic')
+    savePath = sprintf('./exp/exp_offline_%s_%s.mat', target.config.database, target.config.category);
+elseif strcmp(target.config.database, 'willow')
+    savePath = sprintf('./exp/exp_offline_%s_%s_%s.mat', target.config.database, target.config.class, target.config.category);
 end
 
-graphStep = 1;
-baseGraphCnt = graphMinCnt;
-graphRange = baseGraphCnt:graphStep:graphMaxCnt-graphStep;
-target.config.baseGraphCnt = baseGraphCnt;
-target.config.graphRange = graphRange;
-target.config.initConstWeight = .2; % initial weight for consitency regularizer, suggest 0.2-0.25
-target.config.constStep = 1.1;% inflate parameter, suggest 1.1-1.2
-target.config.constWeightMax = 1;
-target.config.constIterImmune = 2; % in early iterations, not involve consistency, suggest 1-3
-target.config.edgeAffinityWeight = 1;% in random graphs, only edge affinity is used, angle is meaningless
-target.config.angleAffinityWeight = 1 - target.config.edgeAffinityWeight;
-target.config.selectNodeMask = 1:1:nInlier+target.config.nOutlier;
-target.config.selectGraphMask{1} = 1:graphMaxCnt;
-paraCnt = length(graphRange);
+% set algorithms
+algNameSepSpace = '                    ';
+algSet.algNameSet = {'cao_c_raw','imgm_d','imgm_r','lne_imgm','lne_imgm_a16','lne_imgm_d16', 'lne_imgm_a32','lne_imgm_d32'};
+algSet.algEnable =  [     1,        1,       1,         1,          0,              0,             1,              1];
+algSet.algColor = { cao_c_rawClr,imgm_dClr,imgm_rClr,lne_imgmClr,lne_imgmaClr16,lne_imgmdClr16, lne_imgmaClr16,lne_imgmdClr16};
+algSet.algLineStyle = {'-',        '--',      '--',      '-.',        '-.',            '-.',          '-.'            '-.'};
+algSet.algMarker = {   '.',        '.',       '.',       '.',        '.',            '.',              '.',            '.'};
 
 
-[~,cao_pcIdx] = ismember('cao_pc',algSet.algNameSet);
-[~,cao_pc_rawIdx] = ismember('cao_pc_raw',algSet.algNameSet);
+[~,cao_c_rawIdx] = ismember('cao_c_raw',algSet.algNameSet);
 [~,imgm_dIdx] = ismember('imgm_d',algSet.algNameSet);
 [~,imgm_rIdx] = ismember('imgm_r',algSet.algNameSet);
-[~,tbimgm_caoIdx] = ismember('tbimgm_cao', algSet.algNameSet);
-[~,tbimgm_cao_pcIdx] = ismember('tbimgm_cao_pc', algSet.algNameSet);
-[~,tbimgm_cao_ucIdx] = ismember('tbimgm_cao_uc', algSet.algNameSet);
-[~,tbimgm_qmIdx] = ismember('tbimgm_qm', algSet.algNameSet);
-[~,tbimgm_matchALSIdx] = ismember('tbimgm_matchALS', algSet.algNameSet);
-[~,tbimgm_cao_pc_orderedIdx] = ismember('tbimgm_cao_pc_ordered', algSet.algNameSet);
+[~,lne_imgmIdx] = ismember('lne_imgm',algSet.algNameSet);
+[~,lne_imgm_a16Idx] = ismember('lne_imgm_a16',algSet.algNameSet);
+[~,lne_imgm_d16Idx] = ismember('lne_imgm_d16',algSet.algNameSet);
+[~,lne_imgm_a32Idx] = ismember('lne_imgm_a32',algSet.algNameSet);
+[~,lne_imgm_d32Idx] = ismember('lne_imgm_d32',algSet.algNameSet);
 
-
-algCnt = length(algSet.algNameSet);
-X=cell(algCnt,1);
-target.config.nodeCnt = length(target.config.selectNodeMask);
-% target.config.graphCnt = min(max(graphRange),length(target.config.selectGraphMask{1}));
-target.config.graphCnt = 60;
+nInlier = target.config.nInlier;
+nOutlier = target.config.nOutlier;
+target.config.nodeCnt = nInlier + nOutlier;
 nodeCnt = target.config.nodeCnt;
-graphCnt = target.config.graphCnt;
 
-% paraCnt: iterate over graph #
-% algCnt: iterate over algorithms
-% testCnt: iterate over tests
-timAve = zeros(algCnt,testCnt);timAveFull = zeros(algCnt);
-accAve = zeros(algCnt,testCnt);accAveFull = zeros(algCnt);
-scrAve = zeros(algCnt,testCnt);scrAveFull = zeros(algCnt);
-conPairAve = zeros(algCnt,testCnt);conPairAveFull = zeros(algCnt);
-countPairAve = zeros(algCnt,testCnt);countPairAveFull = zeros(algCnt);
-accStd = zeros(algCnt,testCnt);accStdFull = zeros(algCnt);
-scrStd = zeros(algCnt,testCnt);scrStdFull = zeros(algCnt);
-conPairStd = zeros(algCnt,testCnt);conPairStdFull = zeros(paraCnt,algCnt);
 
-% conMatPairGraph = cell(paraCnt,algCnt,testCnt);
-% accMatPairGraph = cell(paraCnt,algCnt,testCnt);
-% scrMatPairGraph = cell(paraCnt,algCnt,testCnt);
+% algorithms for affinity and CAO
+target.config.Sacle_2D = 0.05;
+target.config.iterRange = 6;
+target.config.distRatioTrue = 0.15;
+target.config.testType = 'all';% massOutlier
+target.config.constStep = 1.05;% the inflate parameter, e.g. 1.05-1.1
+target.config.constWeightMax = 1;% the upperbound, always set to 1
+target.config.initConstWeight = 0.2; % initial weight for consitency regularizer, suggest 0.2-0.25
+target.config.constIterImmune = 2; % in early iterations, not involve consistency, suggest 1-3
+target.config.edgeAffinityWeight = 0.9;% in random graphs, only edge affinity is used, angle is meaningless
+target.config.angleAffinityWeight = 1 - target.config.edgeAffinityWeight;
+target.config.selectNodeMask = 1:1:nInlier+target.config.nOutlier;
+% target.config.selectGraphMask{1} = 1:target.config.graphMaxCnt;
+target.config.connect = 'nfc';
+
+% data for experiment
+paraCnt = length(graphCntRange);% paraCnt: iterate over graph #
+algCnt = length(algSet.algNameSet);% algCnt: iterate over algorithms
+testCnt = target.config.testCnt;% testCnt: iterate over tests
+timAve = zeros(paraCnt,algCnt,testCnt);timAveFull = zeros(paraCnt,algCnt);
+accAve = zeros(paraCnt,algCnt,testCnt);accAveFull = zeros(paraCnt,algCnt);
+scrAve = zeros(paraCnt,algCnt,testCnt);scrAveFull = zeros(paraCnt,algCnt);
+conPairAve = zeros(paraCnt,algCnt,testCnt);conPairAveFull = zeros(paraCnt,algCnt);
+countPairAve = zeros(paraCnt,algCnt,testCnt);countPairAveFull = zeros(paraCnt,algCnt);
+
 acc = cell(1, algCnt);
 scr = cell(1, algCnt);
 con = cell(1, algCnt);
-% prevMatching = cell(1, algCnt);
-Matching = cell(1, algCnt);
 matTmp = cell(1, algCnt);
+Matching = cell(1, algCnt);
 
-fidPerf = fopen('results.csv','w');
-fprintf(fidPerf, 'testType,bGraphMatch,unaryFeat,edgeFeat,inCntType,database,category,testCnt,iter#,total node#,outlier#,complete,density,deform,graph#,alg#,scale,edgeWeight,initConstWeight,consStep,constWeightMax,iterImmune\n');
-fprintf(fidPerf, '%s,%d,%d,%d,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%d,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%d\n',...
-    target.config.testType,target.config.bGraphMatch,target.config.bUnaryEnable,target.config.bEdgeEnable,target.config.inCntType,target.config.database,target.config.category,...
-    testCnt,max(iterRange),nodeCnt,target.config.nOutlier,target.config.complete,target.config.density,target.config.deform,graphCnt,sum(algSet.algEnable),target.config.Sacle_2D,target.config.edgeAffinityWeight,...
-    target.config.initConstWeight,target.config.constStep,target.config.constWeightMax,target.config.constIterImmune);
-fprintf('testType=%s, bGraphMatch=%d, unaryEnable=%d, edgeEnable=%d, inCntType=%s, database=%s, category=%s, iter#=%d, test#=%d, node#=%d, outlier#=%d,complete=%.2f, density=%.2f, deform=%.2f, graph#=%d, alg#=%d, edgeWeight=%.2f, scale=%.2f, initW=%.2f, stepW=%.2f, maxW=%.2f,iterImmune=%d\n',...
-    target.config.testType,target.config.bGraphMatch,target.config.bUnaryEnable,target.config.bEdgeEnable,target.config.inCntType,target.config.database,target.config.category,max(iterRange),testCnt,...
-    nodeCnt,target.config.nOutlier,target.config.complete,target.config.density,target.config.deform,graphCnt,sum(algSet.algEnable),...
-    target.config.edgeAffinityWeight,target.config.Sacle_2D,target.config.initConstWeight,target.config.constStep,target.config.constWeightMax,target.config.constIterImmune);
-fprintf('\n');fprintf(fidPerf,'\n');
-inlierAcc = zeros(paraCnt,testCnt);
-estErr = zeros(testCnt,1);
-
-
-%% Run the test
-%%%%%%%%%%%%%%%%%%  experiment 1 different incremental algorithms %%%%%%%%%%%%%%%%%%%%%
-
-for testk = 1:testCnt
-    fprintf('Run test in round %d\n', testk);
-
-    affinity = generateRandomAffinity(nInlier,testk); 
-    affinity.GT = repmat(eye(nodeCnt,nodeCnt),graphCnt,graphCnt);
-
-    % rrwm pairwise match, once for all graph pairs
-    rawMat = generatePairAssignment(algpar,nodeCnt,graphCnt,testk);
-
-    switch target.config.inCntType
-        case 'exact' % already known, used in Fig.5 and top two rows in Fig.6
-             target.config.inCnt = nodeCnt - target.config.nOutlier;
-        case 'all' % in case of few outliers, used in Fig.1,2,3,4
-             target.config.inCnt = nodeCnt;
-        case 'spec' % specified by user, used in the bottom row of Fig.6
-            target.config.inCnt = specNodeCnt;
+for parak = 1:paraCnt
+    graphCnt = graphCntRange(parak);
+    target.config.graphCnt = graphCnt;
+    
+    for testk = 1:testCnt
+        fprintf('Run test in round %d/%d\n', testk, testCnt);
+        
+        affinity = generateAffinity(testk);
+        rawMat = generatePairAssignment(algpar,nodeCnt,graphCnt,testk);
+        %debug
+        accuracy_raw = cal_pair_graph_accuracy(rawMat, affinity.GT, target.config.nOutlier, nodeCnt, graphCnt);
+        accuracy_ave = mean(accuracy_raw(:));
+        fprintf("raw accuracy = %f\n", accuracy_ave);
+        %debug
+        sigma = 0;
+        % rrwm pairwise match, once for all graph pairs
+        switch target.config.inCntType
+            case 'exact' % already known, used in Fig.5 and top two rows in Fig.6
+                target.config.inCnt = nodeCnt - target.config.nOutlier;
+            case 'all' % in case of few outliers, used in Fig.1,2,3,4
+                target.config.inCnt = nodeCnt;
+            case 'spec' % specified by user, used in the bottom row of Fig.6
+                target.config.inCnt = specNodeCnt;
+        end
+        
+        target.pairwiseMask = cell(1);
+        target.pairwiseMask{1} = ones(graphCnt*nodeCnt,graphCnt*nodeCnt);
+        scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,target.config.inCnt);
+        scrDenomMatInCntGT = cal_pair_graph_inlier_score(affinity.GT,affinity.GT,nodeCnt,graphCnt,target.config.inCnt);
+        scrDenomCurrent = max(max(scrDenomMatInCnt));
+        
+        %%%%%%%%%%%% calculate the incremental matching with cao_c_raw %%%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(cao_c_rawIdx)
+            tStart = tic;
+            Matching{cao_c_rawIdx} = CAO(rawMat, nodeCnt, graphCnt, target.config.iterRange, scrDenomCurrent, 'exact', 1);
+            tEnd = toc(tStart);
+            
+            acc{cao_c_rawIdx} = cal_pair_graph_accuracy(Matching{cao_c_rawIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{cao_c_rawIdx} = cal_pair_graph_score(Matching{cao_c_rawIdx},affinity.GT,nodeCnt,graphCnt);
+            con{cao_c_rawIdx} = cal_pair_graph_consistency(Matching{cao_c_rawIdx},nodeCnt,graphCnt,0);
+            accAve(parak, cao_c_rawIdx, testk) = mean(acc{cao_c_rawIdx}(:));
+            scrAve(parak, cao_c_rawIdx, testk) = mean(scr{cao_c_rawIdx}(:));
+            conPairAve(parak, cao_c_rawIdx, testk) = mean(con{cao_c_rawIdx}(:));
+            timAve(parak, cao_c_rawIdx, testk) = tEnd;
+            countPairAve(parak, cao_c_rawIdx, testk) = graphCnt;
+        end
+        
+        %%%%%%%%%%% calculate the incremental matching with imgm_d %%%%%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(imgm_dIdx)
+            param.iterMax = target.config.iterRange;
+            param.visualization = 0;
+            param.method = 1; % isDPP = 1; isAP = 2; isRand = 3; isTIP = 4;
+            
+            tStart = tic;
+            [Matching{imgm_dIdx}, numPairMatch] = IMGM_offline(rawMat,nodeCnt,graphCnt,param);
+            tEnd = toc(tStart);
+            
+            acc{imgm_dIdx} = cal_pair_graph_accuracy(Matching{imgm_dIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{imgm_dIdx} = cal_pair_graph_score(Matching{imgm_dIdx},affinity.GT,nodeCnt,graphCnt);
+            con{imgm_dIdx} = cal_pair_graph_consistency(Matching{imgm_dIdx},nodeCnt,graphCnt,0);
+            accAve(parak, imgm_dIdx, testk) = mean(acc{imgm_dIdx}(:));
+            scrAve(parak, imgm_dIdx, testk) = mean(scr{imgm_dIdx}(:));
+            conPairAve(parak, imgm_dIdx, testk) = mean(con{imgm_dIdx}(:));
+            timAve(parak, imgm_dIdx, testk) = tEnd;
+            countPairAve(parak, imgm_dIdx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%% calculate the incremental matching with imgm_r %%%%%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(imgm_rIdx)
+            param.iterMax = target.config.iterRange;
+            param.visualization = 0;
+            param.method = 3; % isDPP = 1; isAP = 2; isRand = 3; isTIP = 4;
+            
+            tStart = tic;
+            [Matching{imgm_rIdx}, numPairMatch] = IMGM_offline(rawMat,nodeCnt,graphCnt,param);
+            tEnd = toc(tStart);
+            
+            acc{imgm_rIdx} = cal_pair_graph_accuracy(Matching{imgm_rIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{imgm_rIdx} = cal_pair_graph_score(Matching{imgm_rIdx},affinity.GT,nodeCnt,graphCnt);
+            con{imgm_rIdx} = cal_pair_graph_consistency(Matching{imgm_rIdx},nodeCnt,graphCnt,0);
+            accAve(parak, imgm_rIdx, testk) = mean(acc{imgm_rIdx}(:));
+            scrAve(parak, imgm_rIdx, testk) = mean(scr{imgm_rIdx}(:));
+            conPairAve(parak, imgm_rIdx, testk) = mean(con{imgm_rIdx}(:));
+            timAve(parak, imgm_rIdx, testk) = tEnd;
+            countPairAve(parak, imgm_rIdx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with lne_imgm %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(lne_imgmIdx)
+            param.subMethodParam.name = 'CAO';
+            param.subMethodParam.iterMax = target.config.iterRange;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+            [Matching{lne_imgmIdx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,1,0,'None',param);
+            tEnd = toc(tStart);
+            
+            acc{lne_imgmIdx} = cal_pair_graph_accuracy(Matching{lne_imgmIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{lne_imgmIdx} = cal_pair_graph_score(Matching{lne_imgmIdx},affinity.GT,nodeCnt,graphCnt);
+            con{lne_imgmIdx} = cal_pair_graph_consistency(Matching{lne_imgmIdx},nodeCnt,graphCnt,0);
+            accAve(parak, lne_imgmIdx, testk) = mean(acc{lne_imgmIdx}(:));
+            scrAve(parak, lne_imgmIdx, testk) = mean(scr{lne_imgmIdx}(:));
+            conPairAve(parak, lne_imgmIdx, testk) = mean(con{lne_imgmIdx}(:));
+            timAve(parak, lne_imgmIdx, testk) = tEnd;
+            countPairAve(parak, lne_imgmIdx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with lne_imgm_a16 %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(lne_imgm_a16Idx)
+            param.subMethodParam.name = 'CAO';
+            param.subMethodParam.iterMax = target.config.iterRange;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+            [Matching{lne_imgm_a16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'a',param);
+            tEnd = toc(tStart);
+            
+            acc{lne_imgm_a16Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_a16Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{lne_imgm_a16Idx} = cal_pair_graph_score(Matching{lne_imgm_a16Idx},affinity.GT,nodeCnt,graphCnt);
+            con{lne_imgm_a16Idx} = cal_pair_graph_consistency(Matching{lne_imgm_a16Idx},nodeCnt,graphCnt,0);
+            accAve(parak, lne_imgm_a16Idx, testk) = mean(acc{lne_imgm_a16Idx}(:));
+            scrAve(parak, lne_imgm_a16Idx, testk) = mean(scr{lne_imgm_a16Idx}(:));
+            conPairAve(parak, lne_imgm_a16Idx, testk) = mean(con{lne_imgm_a16Idx}(:));
+            timAve(parak, lne_imgm_a16Idx, testk) = tEnd;
+            countPairAve(parak, lne_imgm_a16Idx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with lne_imgm_d16 %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(lne_imgm_d16Idx)
+            param.subMethodParam.name = 'CAO';
+            param.subMethodParam.iterMax = target.config.iterRange;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+            [Matching{lne_imgm_d16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'d',param);
+            tEnd = toc(tStart);
+            
+            acc{lne_imgm_d16Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_d16Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{lne_imgm_d16Idx} = cal_pair_graph_score(Matching{lne_imgm_d16Idx},affinity.GT,nodeCnt,graphCnt);
+            con{lne_imgm_d16Idx} = cal_pair_graph_consistency(Matching{lne_imgm_d16Idx},nodeCnt,graphCnt,0);
+            accAve(parak, lne_imgm_d16Idx, testk) = mean(acc{lne_imgm_d16Idx}(:));
+            scrAve(parak, lne_imgm_d16Idx, testk) = mean(scr{lne_imgm_d16Idx}(:));
+            conPairAve(parak, lne_imgm_d16Idx, testk) = mean(con{lne_imgm_d16Idx}(:));
+            timAve(parak, lne_imgm_d16Idx, testk) = tEnd;
+            countPairAve(parak, lne_imgm_d16Idx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with lne_imgm_a32 %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(lne_imgm_a32Idx)
+            param.subMethodParam.name = 'CAO';
+            param.subMethodParam.iterMax = target.config.iterRange;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+            [Matching{lne_imgm_a32Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'a',param);
+            tEnd = toc(tStart);
+            
+            acc{lne_imgm_a32Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_a32Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{lne_imgm_a32Idx} = cal_pair_graph_score(Matching{lne_imgm_a32Idx},affinity.GT,nodeCnt,graphCnt);
+            con{lne_imgm_a32Idx} = cal_pair_graph_consistency(Matching{lne_imgm_a32Idx},nodeCnt,graphCnt,0);
+            accAve(parak, lne_imgm_a32Idx, testk) = mean(acc{lne_imgm_a32Idx}(:));
+            scrAve(parak, lne_imgm_a32Idx, testk) = mean(scr{lne_imgm_a32Idx}(:));
+            conPairAve(parak, lne_imgm_a32Idx, testk) = mean(con{lne_imgm_a32Idx}(:));
+            timAve(parak, lne_imgm_a32Idx, testk) = tEnd;
+            countPairAve(parak, lne_imgm_a32Idx, testk) = numPairMatch;
+        end
+        
+        %%%%%%%%%%%% calculate the incremental matching with lne_imgm_d32 %%%%%%%%%%%%%%%%%%%%
+        if algSet.algEnable(lne_imgm_d32Idx)
+            param.subMethodParam.name = 'CAO';
+            param.subMethodParam.iterMax = target.config.iterRange;
+            param.subMethodParam.optType = 'exact';
+            param.subMethodParam.useCstInlier = 1;
+            param.bVerbose = 0;
+            param.maxNumSearch = target.config.maxNumSearch;
+            
+            tStart = tic;
+            [Matching{lne_imgm_d32Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'d',param);
+            tEnd = toc(tStart);
+            
+            acc{lne_imgm_d32Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_d32Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
+            scr{lne_imgm_d32Idx} = cal_pair_graph_score(Matching{lne_imgm_d32Idx},affinity.GT,nodeCnt,graphCnt);
+            con{lne_imgm_d32Idx} = cal_pair_graph_consistency(Matching{lne_imgm_d32Idx},nodeCnt,graphCnt,0);
+            accAve(parak, lne_imgm_d32Idx, testk) = mean(acc{lne_imgm_d32Idx}(:));
+            scrAve(parak, lne_imgm_d32Idx, testk) = mean(scr{lne_imgm_d32Idx}(:));
+            conPairAve(parak, lne_imgm_d32Idx, testk) = mean(con{lne_imgm_d32Idx}(:));
+            timAve(parak, lne_imgm_d32Idx, testk) = tEnd;
+            countPairAve(parak, lne_imgm_d32Idx, testk) = numPairMatch;
+        end
+        
+        fprintf('%d graphs, test in round %d/%d\n', graphCnt, testk, testCnt);
+        fprintf('%-18s%-18s%-18s%-18s%-18s%-18s\n','field\alg', 'accuracy', 'score', 'consistency', 'time', 'numPairMatch');
+        for alg = find(algSet.algEnable)
+            fprintf('%-18s%-18f%-18f%-18f%-18f%-18d\n\n',algSet.algNameSet{alg}, accAve(parak, alg, testk), scrAve(parak, alg, testk), conPairAve(parak, alg, testk), timAve(parak, alg, testk), countPairAve(parak, alg, testk));
+        end
     end
     
-    scrDenomMatInCnt = cal_pair_graph_inlier_score(rawMat,affinity.GT,nodeCnt,graphCnt,target.config.inCnt);
-    scrDenomMatInCntGT = cal_pair_graph_inlier_score(affinity.GT,affinity.GT,nodeCnt,graphCnt,target.config.inCnt);
-    scrDenomCurrent = max(max(scrDenomMatInCnt));
-
-    %%%%%%%%%%%% calculate the multigraph matching with cao_pc %%%%%%%%%%%%%%%%%%%%%
-    if algSet.algEnable(cao_pcIdx)
-        tStart = tic;
-        Matching{cao_pcIdx} = CAO(rawMat, nodeCnt, graphCnt, iterRange, scrDenomCurrent, 'pair', 1);
-        tEnd = toc(tStart);
-        
-        acc{cao_pcIdx} = cal_pair_graph_accuracy(Matching{cao_pcIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-        scr{cao_pcIdx} = cal_pair_graph_score(Matching{cao_pcIdx},affinity.GT,nodeCnt,graphCnt);
-        con{cao_pcIdx} = cal_pair_graph_consistency(Matching{cao_pcIdx},nodeCnt,graphCnt,0);
-        accAve(cao_pcIdx, testk) = mean(acc{cao_pcIdx}(:));
-        scrAve(cao_pcIdx, testk) = mean(scr{cao_pcIdx}(:));
-        conPairAve(cao_pcIdx, testk) = mean(con{cao_pcIdx}(:));
-        timAve(cao_pcIdx, testk) = tEnd;
-        countPairAve(cao_pcIdx, testk) = graphCnt;
+    for algk = 1:algCnt
+        timAveFull(parak,algk) = mean(timAve(parak,algk,:));
+        accAveFull(parak,algk) = mean(accAve(parak,algk,:));
+        scrAveFull(parak,algk) = mean(scrAve(parak,algk,:));
+        conPairAveFull(parak,algk) = mean(conPairAve(parak,algk,:));
+        countPairAveFull(parak, algk) = mean(countPairAve(parak, algk, :));
     end
     
-    %%%%%%%%%%%% calculate the multigraph matching with imgm_d %%%%%%%%%%%%%%%%%%%%%
-    if algSet.algEnable(imgm_dIdx)     
-        param.iterMax = iterRange;
-        param.visualization = 0;
-        param.method = 1; % isDPP = 1; isAP = 2; isRand = 3; isTIP = 4;
-        
-        tStart = tic;
-        Matching{imgm_dIdx} = IMGM_offline(rawMat,nodeCnt,graphCnt,param);
-        tEnd = toc(tStart);
-        
-        acc{imgm_dIdx} = cal_pair_graph_accuracy(Matching{imgm_dIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-        scr{imgm_dIdx} = cal_pair_graph_score(Matching{imgm_dIdx},affinity.GT,nodeCnt,graphCnt);
-        con{imgm_dIdx} = cal_pair_graph_consistency(Matching{imgm_dIdx},nodeCnt,graphCnt,0);
-        accAve(imgm_dIdx, testk) = mean(acc{imgm_dIdx}(:));
-        scrAve(imgm_dIdx, testk) = mean(scr{imgm_dIdx}(:));
-        conPairAve(imgm_dIdx, testk) = mean(con{imgm_dIdx}(:));
-        timAve(imgm_dIdx, testk) = tEnd;
-        countPairAve(imgm_dIdx, testk) = graphCnt;
-    end
-    
-    %%%%%%%%%%%% calculate the multigraph matching with imgm_r %%%%%%%%%%%%%%%%%%%%%
-    if algSet.algEnable(imgm_rIdx)     
-        param.iterMax = iterRange;
-        param.visualization = 0;
-        param.method = 3; % isDPP = 1; isAP = 2; isRand = 3; isTIP = 4;
-        
-        tStart = tic;
-        Matching{imgm_rIdx} = IMGM_offline(rawMat,nodeCnt,graphCnt,param);
-        tEnd = toc(tStart);
-        
-        acc{imgm_rIdx} = cal_pair_graph_accuracy(Matching{imgm_rIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-        scr{imgm_rIdx} = cal_pair_graph_score(Matching{imgm_rIdx},affinity.GT,nodeCnt,graphCnt);
-        con{imgm_rIdx} = cal_pair_graph_consistency(Matching{imgm_rIdx},nodeCnt,graphCnt,0);
-        accAve(imgm_rIdx, testk) = mean(acc{imgm_rIdx}(:));
-        scrAve(imgm_rIdx, testk) = mean(scr{imgm_rIdx}(:));
-        conPairAve(imgm_rIdx, testk) = mean(con{imgm_rIdx}(:));
-        timAve(imgm_rIdx, testk) = tEnd;
-        countPairAve(imgm_rIdx, testk) = graphCnt;
-    end
-    
-    %%%%%%%%%%%% calculate the multigraph matching with tbimgm_cao_pc %%%%%%%%%%%%%%%%%%%%%
-    % param of tbimgm
-    param.bVerbose = 0;
-    param.maxNumSearch = 20;
-    if algSet.algEnable(tbimgm_cao_pcIdx)
-        % param for tbimgm_cao_pc
-        param.subMethodParam.name = 'CAO';
-        param.subMethodParam.useCstDecay = 1;
-        param.subMethodParam.cstDecay  = 0.7;
-        param.subMethodParam.useWeightedDecay  = 0;
-        param.subMethodParam.iterMax = 5;
-        param.subMethodParam.scrDenom = scrDenomCurrent;
-        param.subMethodParam.optType = 'pair';
-        param.subMethodParam.useCstInlier = 1;
-        
-        % param for adaptive order
-        param.adaptive_order = false;
-        
-        tStart = tic;
-        Matching{tbimgm_cao_pcIdx} = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param);
-        tEnd = toc(tStart);
-        
-        acc{tbimgm_cao_pcIdx} = cal_pair_graph_accuracy(Matching{tbimgm_cao_pcIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-        scr{tbimgm_cao_pcIdx} = cal_pair_graph_score(Matching{tbimgm_cao_pcIdx},affinity.GT,nodeCnt,graphCnt);
-        con{tbimgm_cao_pcIdx} = cal_pair_graph_consistency(Matching{tbimgm_cao_pcIdx},nodeCnt,graphCnt,0);
-        accAve(tbimgm_cao_pcIdx, testk) = mean(acc{tbimgm_cao_pcIdx}(:));
-        scrAve(tbimgm_cao_pcIdx, testk) = mean(scr{tbimgm_cao_pcIdx}(:));
-        conPairAve(tbimgm_cao_pcIdx, testk) = mean(con{tbimgm_cao_pcIdx}(:));
-        timAve(tbimgm_cao_pcIdx, testk) = tEnd;
-        countPairAve(tbimgm_cao_pcIdx, testk) = graphCnt;
-    end
-    
-    %%%%%%%%%%%% calculate the multigraph matching with tbimgm_cao_ordered %%%%%%%%%%%%%%%%%%%%%
-    % param of tbimgm
-    param.bVerbose = 0;
-    param.maxNumSearch = 20;
-    if algSet.algEnable(tbimgm_cao_pc_orderedIdx)
-        % param for tbimgm_cao_pc
-        param.subMethodParam.name = 'CAO';
-        param.subMethodParam.useCstDecay = 1;
-        param.subMethodParam.cstDecay  = 0.7;
-        param.subMethodParam.useWeightedDecay  = 0;
-        param.subMethodParam.iterMax = 5;
-        param.subMethodParam.scrDenom = scrDenomCurrent;
-        param.subMethodParam.optType = 'pair';
-        param.subMethodParam.useCstInlier = 1;
-        
-        % param for adaptive order
-        param.adaptive_order = true;
-        
-        tStart = tic;
-        Matching{tbimgm_cao_pc_orderedIdx} = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param);
-        tEnd = toc(tStart);
-        
-        acc{tbimgm_cao_pc_orderedIdx} = cal_pair_graph_accuracy(Matching{tbimgm_cao_pc_orderedIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-        scr{tbimgm_cao_pc_orderedIdx} = cal_pair_graph_score(Matching{tbimgm_cao_pc_orderedIdx},affinity.GT,nodeCnt,graphCnt);
-        con{tbimgm_cao_pc_orderedIdx} = cal_pair_graph_consistency(Matching{tbimgm_cao_pc_orderedIdx},nodeCnt,graphCnt,0);
-        accAve(tbimgm_cao_pc_orderedIdx, testk) = mean(acc{tbimgm_cao_pc_orderedIdx}(:));
-        scrAve(tbimgm_cao_pc_orderedIdx, testk) = mean(scr{tbimgm_cao_pc_orderedIdx}(:));
-        conPairAve(tbimgm_cao_pc_orderedIdx, testk) = mean(con{tbimgm_cao_pc_orderedIdx}(:));
-        timAve(tbimgm_cao_pc_orderedIdx, testk) = tEnd;
-        countPairAve(tbimgm_cao_pc_orderedIdx, testk) = graphCnt;
-    end
-    
-    %%%%%%%%%%%% calculate the multigraph matching with tbimgm_cao_uc %%%%%%%%%%%%%%%%%%%%%
-    if algSet.algEnable(tbimgm_cao_ucIdx)
-        % param for tbimgm_cao_pc
-        param.subMethodParam.name = 'CAO';
-        param.subMethodParam.useCstDecay = 1;
-        param.subMethodParam.cstDecay  = 0.7;
-        param.subMethodParam.useWeightedDecay  = 0;
-        param.subMethodParam.iterMax = 5;
-        param.subMethodParam.scrDenom = scrDenomCurrent;
-        param.subMethodParam.optType = 'unary';
-        param.subMethodParam.useCstInlier = 1;
-        
-        tStart = tic;
-        Matching{tbimgm_cao_ucIdx} = TBIMGM_offline(rawMat,nodeCnt,graphCnt,param);
-        tEnd = toc(tStart);
-        
-        acc{tbimgm_cao_ucIdx} = cal_pair_graph_accuracy(Matching{tbimgm_cao_ucIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
-        scr{tbimgm_cao_ucIdx} = cal_pair_graph_score(Matching{tbimgm_cao_ucIdx},affinity.GT,nodeCnt,graphCnt);
-        con{tbimgm_cao_ucIdx} = cal_pair_graph_consistency(Matching{tbimgm_cao_ucIdx},nodeCnt,graphCnt,0);
-        accAve(tbimgm_cao_ucIdx, testk) = mean(acc{tbimgm_cao_ucIdx}(:));
-        scrAve(tbimgm_cao_ucIdx, testk) = mean(scr{tbimgm_cao_ucIdx}(:));
-        conPairAve(tbimgm_cao_ucIdx, testk) = mean(con{tbimgm_cao_ucIdx}(:));
-        timAve(tbimgm_cao_ucIdx, testk) = tEnd;
-        countPairAve(tbimgm_cao_ucIdx, testk) = graphCnt;
-    end
-    
-    fprintf('test in round %d\n',testk);
+    fprintf('%d graphs overall\n', graphCnt);
     fprintf('%-18s%-18s%-18s%-18s%-18s%-18s\n','field\alg', 'accuracy', 'score', 'consistency', 'time', 'numPairMatch');
     for alg = find(algSet.algEnable)
-        fprintf('%-18s%-18f%-18f%-18f%-18f%-18d\n\n',algSet.algNameSet{alg}, accAve(alg, testk), scrAve(alg, testk), conPairAve(alg, testk), timAve(alg, testk), countPairAve(alg, testk));
+        fprintf('%-18s%-18f%-18f%-18f%-18f%-18d\n\n',algSet.algNameSet{alg}, accAveFull(parak, alg), scrAveFull(parak, alg), conPairAveFull(parak, alg), timAveFull(parak, alg), countPairAveFull(parak, alg));
     end
-
-end % for testCnt
-
-for algk = 1:algCnt
-    timAveFull(algk) = mean(timAve(algk,:));
-    accAveFull(algk) = mean(accAve(algk,:));
-    scrAveFull(algk) = mean(scrAve(algk,:));
-    conPairAveFull(algk) = mean(conPairAve(algk,:));
-    countPairAveFull(algk) = mean(countPairAve(algk,:));
 end
     
-i = 0;
-savePath = sprintf('./res/off/offline_exp_%d.mat', i);
-
-while isfile(savePath)
-    i = i + 1;
-    savePath = sprintf('./res/off/offline_exp_%d.mat', i);
+% rename the algorithm names to be more friendly
+for i=1:length(algSet.algNameSet)
+    if strcmp(target.config.testType,'massOutlier')
+        algSet.algNameSetDisplay{cao_Idx} = 'cao^{cst}';
+        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSet{i},'_s','^{sim}');
+        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSetDisplay{i},'o_','o-');
+        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSetDisplay{i},'c_','c^{cst}');
+    else
+        algSet.algNameSetDisplay{i} = strrep(algSet.algNameSet{i},'_','-');
+        if algSet.algNameSetDisplay{i}(end)=='-'
+            algSet.algNameSetDisplay{i}(end) = '*';
+        end
+    end
 end
+
+fprintf('--------------------------------------------------------------overall performance-------------------------------------------------------------------\n');
+algNamePreSpace = '                          ';
+fprintf(algNamePreSpace);
+for algk=1:algCnt
+    if algSet.algEnable(algk)==0,continue;end
+    fprintf([algSet.algNameSetDisplay{algk},algNameSepSpace]);
+end
+fprintf('\n');
+fprintf('grh# itr#  ');
+for algk=1:algCnt
+    if algSet.algEnable(algk)==0,continue;end
+    fprintf(' acc   scr   con   tim   pair');
+end
+fprintf('\n');
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+fprintf(' %02d,  %02d ',graphCnt,testCnt);
+for algk=1:algCnt
+    if algSet.algEnable(algk)==0,continue;end
+    fprintf('| %.3f %.3f %.3f %.3f %4d',accAveFull(algk),scrAveFull(algk),conPairAveFull(algk),timAveFull(algk), countPairAveFull(algk));
+end
+fprintf('\n');
+
 save(savePath, 'target', 'algSet', 'accAveFull', 'scrAveFull', 'conPairAveFull', 'timAveFull', 'countPairAveFull');
 
+legendOff = 0;
+ave.accuracy = accAveFull;
+ave.score = scrAveFull;
+ave.consistency = conPairAveFull;
+ave.time = timAveFull;
+ave.matchingNumber = countPairAveFull;
+fields = fieldnames(ave);
+for ifield = 1:length(fields)
+    xtag='number of graph';ytag=[fields{ifield}, '(',target.config.category,')'];
+    plotResult_new(legendOff,graphCntRange, getfield(ave,fields{ifield}), algSet, xtag, ytag);
+end
