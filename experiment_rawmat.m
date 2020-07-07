@@ -194,7 +194,7 @@ for testk = 1:testCnt
             matTmp{lne_imgm_rawIdx}(1:nodeCnt*param.N,1:nodeCnt*param.N)=prevMatching{lne_imgm_rawIdx};
             affScore = cal_pair_graph_inlier_score_local(affinity, matTmp{lne_imgm_rawIdx}, nodeCnt, param.N+1, nodeCnt);
             tStart = tic;
-            [increMatching{lne_imgm_rawIdx}, numPairMatch] = ANC_IMGM(affinity, affScore, matTmp{lne_imgm_rawIdx}, target, param);
+            [increMatching{lne_imgm_rawIdx}, numPairMatch] = LNE_IMGM(affinity, affScore, matTmp{lne_imgm_rawIdx}, target, param);
             tEnd = toc(tStart);
             prevMatching{lne_imgm_rawIdx} = increMatching{lne_imgm_rawIdx};
             
@@ -218,7 +218,7 @@ for testk = 1:testCnt
             matTmp{lne_imgm_caoIdx}(1:nodeCnt*param.N,1:nodeCnt*param.N)=prevMatching{lne_imgm_caoIdx};
             affScore = cal_pair_graph_inlier_score_local(affinity, matTmp{lne_imgm_caoIdx}, nodeCnt, param.N+1, nodeCnt);
             tStart = tic;
-            [increMatching{lne_imgm_caoIdx}, numPairMatch] = ANC_IMGM(affinity, affScore, matTmp{lne_imgm_caoIdx}, target, param);
+            [increMatching{lne_imgm_caoIdx}, numPairMatch] = LNE_IMGM(affinity, affScore, matTmp{lne_imgm_caoIdx}, target, param);
             tEnd = toc(tStart);
             prevMatching{lne_imgm_caoIdx} = increMatching{lne_imgm_caoIdx};
             

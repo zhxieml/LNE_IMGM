@@ -177,7 +177,7 @@ for parak = 1:paraCnt
             param.maxNumSearch = target.config.maxNumSearch;
             
             tStart = tic;
-            [Matching{lne_imgmIdx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,1,0,'None',param);
+            [Matching{lne_imgmIdx}, numPairMatch] = LNE_IMGM_offline(rawMat,nodeCnt,graphCnt,1,0,'None',param);
             tEnd = toc(tStart);
             
             acc{lne_imgmIdx} = cal_pair_graph_accuracy(Matching{lne_imgmIdx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
@@ -200,7 +200,7 @@ for parak = 1:paraCnt
             param.maxNumSearch = target.config.maxNumSearch;
             
             tStart = tic;
-            [Matching{lne_imgm_a16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'a',param);
+            [Matching{lne_imgm_a16Idx}, numPairMatch] = LNE_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'a',param);
             tEnd = toc(tStart);
             
             acc{lne_imgm_a16Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_a16Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
@@ -223,7 +223,7 @@ for parak = 1:paraCnt
             param.maxNumSearch = target.config.maxNumSearch;
             
             tStart = tic;
-            [Matching{lne_imgm_d16Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'d',param);
+            [Matching{lne_imgm_d16Idx}, numPairMatch] = LNE_IMGM_offline(rawMat,nodeCnt,graphCnt,16,1,'d',param);
             tEnd = toc(tStart);
             
             acc{lne_imgm_d16Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_d16Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
@@ -246,7 +246,7 @@ for parak = 1:paraCnt
             param.maxNumSearch = target.config.maxNumSearch;
             
             tStart = tic;
-            [Matching{lne_imgm_a32Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'a',param);
+            [Matching{lne_imgm_a32Idx}, numPairMatch] = LNE_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'a',param);
             tEnd = toc(tStart);
             
             acc{lne_imgm_a32Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_a32Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);
@@ -269,7 +269,7 @@ for parak = 1:paraCnt
             param.maxNumSearch = target.config.maxNumSearch;
             
             tStart = tic;
-            [Matching{lne_imgm_d32Idx}, numPairMatch] = ANC_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'d',param);
+            [Matching{lne_imgm_d32Idx}, numPairMatch] = LNE_IMGM_offline(rawMat,nodeCnt,graphCnt,32,1,'d',param);
             tEnd = toc(tStart);
             
             acc{lne_imgm_d32Idx} = cal_pair_graph_accuracy(Matching{lne_imgm_d32Idx},affinity.GT,target.config.nOutlier,nodeCnt,graphCnt);

@@ -100,7 +100,7 @@ for testk = 1:testCnt
         matTmp(1:nodeCnt*param.N,1:nodeCnt*param.N)=prevMatching;
         affScore = cal_pair_graph_inlier_score_local(affinity, matTmp, nodeCnt, param.N+1, nodeCnt);
         tStart = tic;
-        [increMatching, numPairMatch] = ANC_IMGM(affinity, affScore, matTmp, target, param);
+        [increMatching, numPairMatch] = LNE_IMGM(affinity, affScore, matTmp, target, param);
         tEnd = toc(tStart);
         prevMatching = increMatching;
 
