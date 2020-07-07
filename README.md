@@ -1,6 +1,9 @@
 # LNE IMGM
 
-This repository contains MATLAB implementation of ECCV 2020 paper: *Layered Neighborhood Expansion for Incremental Multiple Graph Matching*.
+This repository contains MATLAB implementation of following incremental multi-graph matching methods:
+
+- **IMGM** Tianshu Yu, Junchi Yan, Wei Liu, Baoxin Li, *Incremental Multi-graph Matching via Diversity and Randomness based Graph Clustering*, ECCV 2018.
+- **LNE IMGM** Zixuan Chen, Zhihui Xie, Junchi Yan, Yinqiang Zheng, Xiaokang Yang, *Layered Neighborhood Expansion for Incremental Multiple Graph Matching*, ECCV 2020.
 
 ## Problem setting
 
