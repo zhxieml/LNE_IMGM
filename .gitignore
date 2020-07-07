@@ -4,6 +4,8 @@
 /data
 *.asv
 /res
+/trash
 
 # image
 *.png
+*.fig
