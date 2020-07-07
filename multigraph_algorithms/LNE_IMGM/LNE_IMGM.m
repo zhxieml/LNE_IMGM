@@ -1,5 +1,5 @@
-function [X, numPairMatch] = ANC_IMGM(affinity, affScore, rawMat, target, param)
-    %%  Adaptive Neighbourhood Construction for Incremental Multi-graph Matching(ANC_IMGM)
+function [X, numPairMatch] = LNE_IMGM(affinity, affScore, rawMat, target, param)
+    %%  Layered Neighborhood Expansion for Incremental Multi-graph Matching(ANC_IMGM)
     graphCnt = param.N + 1;
     nodeCnt = param.n;
     X = rawMat(1:nodeCnt*graphCnt, 1:nodeCnt*graphCnt);
