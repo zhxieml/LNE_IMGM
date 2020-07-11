@@ -7,11 +7,11 @@ algpar = setPairwiseSolver();
 setObsoleteVariables;
 
 target.config.graphMinCnt=20; 
-target.config.graphMaxCnt=50; 
-target.config.testCnt = 20; % v
+target.config.graphMaxCnt=40; 
+target.config.testCnt = 1; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 1;
-target.config.database = "synthetic"; % "willow", "synthetic"
+target.config.database = "willow"; % "willow", "synthetic"
 load_target_data;
 
 if strcmp(target.config.database, 'synthetic')

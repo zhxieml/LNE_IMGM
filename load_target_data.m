@@ -3,13 +3,13 @@ function load_target_data
 
     switch target.config.database
     case "willow"
-        target.config.dataDir = 'C:\Users\xzh87\OneDrive\Reference\Lab\code\WILLOW-ObjectClass_dataset';
+        target.config.dataDir = 'C:\Users\zchen\Desktop';
         target.config.imgDir=[target.config.dataDir '/WILLOW-ObjectClass'];
         target.config.annoDir=[target.config.dataDir '/WILLOW-ObjectClass'];
         target.config.gtDir = [target.config.dataDir '/ground_truth'];
         target.config.resDir = './res';
         target.config.tmpDir = './tmp';
-        target.config.class = 'Duck';%'Car','Winebottle','Duck'
+        target.config.class = 'Winebottle';%'Car','Winebottle','Duck'
         target.config.category = 'outlier';%'deform','outlier'
         switch target.config.category
             case 'deform' % same setting with 5th row in Table 1 in the PAMI paper 

@@ -18,3 +18,6 @@ If you want to run experiment on Willow ObjectClass dataset, we provide SIFT-ext
 ## Experiment
 
 Run `experiment_*.m` to reproduce results in the paper.
+The parameter settings are listed in Table 2.
+
+### 

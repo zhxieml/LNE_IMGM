@@ -11,7 +11,7 @@ target.config.graphMaxCnt=50;
 target.config.testCnt = 1; % v
 target.config.maxNumSearch = 20;
 target.config.batchSize = 1;
-target.config.database = "willow"; % "willow", "synthetic"
+target.config.database = "synthetic"; % "willow", "synthetic"
 load_target_data;
 
 if strcmp(target.config.database, 'synthetic')
