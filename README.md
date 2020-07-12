@@ -17,4 +17,17 @@ If you want to run experiment on Willow ObjectClass dataset, we provide SIFT-ext
 
 ## Experiment
 
-Run `experiment_*.m` to reproduce results in the paper.
+Run `experiment_*.m` to reproduce results in the paper. Notice that parameters are set by the struct `target.config`.
+
+| Experiment            | Parameters                                           | Code                        | Comments                                                     |
+| --------------------- | ---------------------------------------------------- | --------------------------- | ------------------------------------------------------------ |
+| Fig. 2, 5             | n_o = 0, c = 1, ϵ = 0.15, ρ = 1, (NA, NB) = (20, 50) | `experiment_online.m`       | Synthetic data                                               |
+| Fig. 3                | n_o = 0, c = 1, ϵ = 0.15, ρ = 1, (NA, NB) = (20, 50) | `experiment_rawmat.m`       | Synthetic data                                               |
+| Fig. 4, 5             | n_o = 4, β = 0.9, (NA, NB) = (20, 40)                | `experiment_online.m`       | WILLOW data. Use different values of `target.config.maxNumSearch` for Fig. 5 |
+| Fig. 7(a)             | n_o = 0, c = 1, ϵ = 0.15, ρ = 1, (NA, NB) = (20, 52) | `experiment_ordering.m`     | Synthetic data                                               |
+| Fig. 7(b)             | n_o = 4, β = 0.9, (NA, NB) = (20, 52)                | `experiment_ordering.m`     | WILLOW data (Winebottle)                                     |
+| Fig. 7(c)             | n_o = 0, c = 1, ϵ = 0.15, ρ = 1, (NA, NB) = (30, 50) | `experiment_distribution.m` | Synthetic data                                               |
+| Fig. 7(d)             | n_o = 4, β = 0.9, (NA, NB) = (30, 50)                | `experiment_distribution.m` | WILLOW data (Car)                                            |
+| Fig. 6(a), 6(b), 6(c) | n_o = 4, β = 0.9                                     | `experiment_offline.m`      | WILLOW data                                                  |
+| Fig. 6(d), 6(e)       | n_o = 0, c = 1, ϵ = 0.15, ρ = 1                      | `experiment_offline.m`      | Synthetic data                                               |
+
