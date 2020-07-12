@@ -16,7 +16,7 @@ graphMinCnt = target.config.graphMinCnt;
 batchSize = target.config.batchSize;
 
 graphCntRange = graphMinCnt:batchSize:graphMaxCnt;
-target.config.database = 'willow'; % 'willow', 'synthetic'
+target.config.database = 'synthetic'; % 'willow', 'synthetic'
 load_target_data;
 
 if strcmp(target.config.database, 'synthetic')
